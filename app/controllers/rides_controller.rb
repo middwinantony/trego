@@ -13,8 +13,10 @@ class RidesController < ApplicationController
 
   def new
     @ride = Ride.new
-    # Optionally, list available drivers
-    @drivers = User.where(role: "driver", available: true)
+    # List available drivers with active subscriptions
+    @drivers = User.where(role: "driver", available: true).select do |driver|
+      driver.has_active_subscription?
+    end
   end
 
   def create

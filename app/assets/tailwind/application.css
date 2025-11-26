@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+/* Make button_to forms display inline for navigation */
+nav form {
+  display: inline-block;
+  margin: 0;
+}
+
+nav form button {
+  cursor: pointer;
+}

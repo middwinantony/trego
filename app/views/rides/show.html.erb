@@ -1,0 +1,10 @@
+<h1>Ride Details</h1>
+
+<p><strong>Rider:</strong> <%= @ride.rider.name %></p>
+<p><strong>Driver:</strong> <%= @ride.driver.name %></p>
+<p><strong>Pickup:</strong> <%= @ride.pickup %></p>
+<p><strong>Dropoff:</strong> <%= @ride.dropoff %></p>
+<p><strong>Status:</strong> <%= @ride.status %></p>
+<p><strong>Fare:</strong> $<%= @ride.fare %></p>
+
+<%= link_to "Back to Rides", rides_path %>

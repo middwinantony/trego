@@ -1,0 +1,14 @@
+<h1>Available Drivers</h1>
+
+<% if @drivers.any? %>
+  <ul>
+    <% @drivers.each do |driver| %>
+      <li>
+        <strong><%= driver.name %></strong> | Available: <%= driver.available ? "Yes" : "No" %>
+        <%= link_to "View Profile", driver_path(driver) %>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <p>No drivers are currently available.</p>
+<% end %>

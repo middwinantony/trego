@@ -1,0 +1,285 @@
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+  <!-- Navigation -->
+  <nav class="bg-white shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16">
+        <div class="flex items-center">
+          <%= link_to root_path do %>
+            <h1 class="text-3xl font-bold text-indigo-600">Trego</h1>
+          <% end %>
+        </div>
+        <div class="flex items-center space-x-4">
+          <%= link_to "Home", root_path, class: "text-gray-700 hover:text-indigo-600 font-medium" %>
+          <%= link_to "Dashboard", dashboard_path, class: "text-indigo-600 font-medium" %>
+          <%= button_to "Logout", destroy_user_session_path, method: :delete, class: "bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-lg transition duration-150" %>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <% if current_user.driver? %>
+    <!-- Driver Dashboard -->
+    <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+      <div class="mb-8">
+        <h2 class="text-3xl font-extrabold text-gray-900">Driver Dashboard</h2>
+        <p class="mt-2 text-gray-600">Welcome back, <%= current_user.name %>!</p>
+      </div>
+
+      <!-- Subscription Status -->
+      <div class="mb-8">
+        <% if current_user.has_active_subscription? %>
+          <div class="bg-green-100 border-l-4 border-green-500 p-6 rounded-lg">
+            <div class="flex items-center">
+              <svg class="h-8 w-8 text-green-600 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <div class="flex-1">
+                <h3 class="text-lg font-semibold text-green-900">Subscription Active</h3>
+                <p class="text-green-700">
+                  <%= Subscription::PLAN_TYPES[current_user.current_subscription.plan_type.to_sym][:name] %> Plan
+                  - Expires on <%= current_user.current_subscription.ends_at.strftime("%B %d, %Y at %I:%M %p") %>
+                </p>
+              </div>
+              <%= link_to "View Subscriptions", subscriptions_path, class: "bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition duration-150" %>
+            </div>
+          </div>
+        <% else %>
+          <div class="bg-yellow-100 border-l-4 border-yellow-500 p-6 rounded-lg">
+            <div class="flex items-center">
+              <svg class="h-8 w-8 text-yellow-600 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+              </svg>
+              <div class="flex-1">
+                <h3 class="text-lg font-semibold text-yellow-900">No Active Subscription</h3>
+                <p class="text-yellow-700">Subscribe to start accepting rides</p>
+              </div>
+              <%= link_to "Subscribe Now", new_subscription_path, class: "bg-yellow-600 hover:bg-yellow-700 text-white font-medium py-2 px-4 rounded-lg transition duration-150" %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- Driver Stats -->
+      <div class="grid md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <div class="flex items-center">
+            <div class="p-3 bg-blue-100 rounded-full">
+              <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+              </svg>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium text-gray-600">Total Rides</p>
+              <p class="text-2xl font-bold text-gray-900"><%= @rides.count %></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <div class="flex items-center">
+            <div class="p-3 bg-green-100 rounded-full">
+              <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium text-gray-600">Completed</p>
+              <p class="text-2xl font-bold text-gray-900"><%= @rides.where(status: 'completed').count %></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <div class="flex items-center">
+            <div class="p-3 bg-purple-100 rounded-full">
+              <svg class="h-8 w-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium text-gray-600">Total Earned</p>
+              <p class="text-2xl font-bold text-gray-900">$<%= @rides.where(status: 'completed').sum(:fare) || 0 %></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Availability Toggle -->
+      <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Availability</h3>
+        <%= form_with(url: driver_path(current_user), method: :patch, class: "flex items-center justify-between") do |f| %>
+          <div class="flex items-center">
+            <span class="mr-4 text-gray-700">
+              <%= current_user.available? ? "You're available for rides" : "You're offline" %>
+            </span>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <%= f.check_box :available, class: "sr-only peer", checked: current_user.available?, onchange: "this.form.submit()" %>
+              <div class="w-14 h-7 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-indigo-600"></div>
+            </label>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- Recent Rides -->
+      <div class="bg-white rounded-xl shadow-md overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h3 class="text-lg font-semibold text-gray-900">Recent Rides</h3>
+        </div>
+        <% if @rides.any? %>
+          <div class="divide-y divide-gray-200">
+            <% @rides.order(created_at: :desc).limit(10).each do |ride| %>
+              <%= link_to ride_path(ride), class: "block hover:bg-gray-50 transition duration-150" do %>
+                <div class="px-6 py-4">
+                  <div class="flex items-center justify-between">
+                    <div class="flex-1">
+                      <p class="text-sm font-medium text-gray-900"><%= ride.pickup %> → <%= ride.dropoff %></p>
+                      <p class="text-sm text-gray-600 mt-1">
+                        Customer: <%= ride.rider.name %>
+                      </p>
+                      <p class="text-xs text-gray-500 mt-1">
+                        <%= ride.created_at.strftime("%B %d, %Y at %I:%M %p") %>
+                      </p>
+                    </div>
+                    <div class="ml-4 flex items-center">
+                      <span class="px-3 py-1 text-sm font-medium rounded-full <%= ride.status == 'completed' ? 'bg-green-100 text-green-800' : ride.status == 'accepted' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800' %>">
+                        <%= ride.status.titleize %>
+                      </span>
+                      <% if ride.fare %>
+                        <span class="ml-4 text-lg font-bold text-gray-900">$<%= ride.fare %></span>
+                      <% end %>
+                    </div>
+                  </div>
+                </div>
+              <% end %>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="px-6 py-12 text-center">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+            </svg>
+            <p class="mt-4 text-gray-600">No rides yet</p>
+            <p class="text-sm text-gray-500 mt-2">Your rides will appear here once you start accepting them</p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% else %>
+    <!-- Customer Dashboard -->
+    <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+      <div class="mb-8">
+        <h2 class="text-3xl font-extrabold text-gray-900">Customer Dashboard</h2>
+        <p class="mt-2 text-gray-600">Welcome back, <%= current_user.name %>!</p>
+      </div>
+
+      <!-- Quick Action -->
+      <div class="mb-8">
+        <%= link_to new_ride_path, class: "block" do %>
+          <div class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl shadow-lg p-8 text-white hover:shadow-xl transition duration-200 transform hover:-translate-y-1">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="text-2xl font-bold mb-2">Request a Ride</h3>
+                <p class="text-indigo-100">Book your next ride in seconds</p>
+              </div>
+              <svg class="h-16 w-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+              </svg>
+            </div>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- Customer Stats -->
+      <div class="grid md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <div class="flex items-center">
+            <div class="p-3 bg-blue-100 rounded-full">
+              <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+              </svg>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium text-gray-600">Total Rides</p>
+              <p class="text-2xl font-bold text-gray-900"><%= @rides.count %></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <div class="flex items-center">
+            <div class="p-3 bg-green-100 rounded-full">
+              <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium text-gray-600">Completed</p>
+              <p class="text-2xl font-bold text-gray-900"><%= @rides.where(status: 'completed').count %></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <div class="flex items-center">
+            <div class="p-3 bg-purple-100 rounded-full">
+              <svg class="h-8 w-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium text-gray-600">Total Spent</p>
+              <p class="text-2xl font-bold text-gray-900">$<%= @rides.where(status: 'completed').sum(:fare) || 0 %></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Rides -->
+      <div class="bg-white rounded-xl shadow-md overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h3 class="text-lg font-semibold text-gray-900">Recent Rides</h3>
+        </div>
+        <% if @rides.any? %>
+          <div class="divide-y divide-gray-200">
+            <% @rides.order(created_at: :desc).limit(10).each do |ride| %>
+              <%= link_to ride_path(ride), class: "block hover:bg-gray-50 transition duration-150" do %>
+                <div class="px-6 py-4">
+                  <div class="flex items-center justify-between">
+                    <div class="flex-1">
+                      <p class="text-sm font-medium text-gray-900"><%= ride.pickup %> → <%= ride.dropoff %></p>
+                      <% if ride.driver %>
+                        <p class="text-sm text-gray-600 mt-1">
+                          Driver: <%= ride.driver.name %>
+                        </p>
+                      <% end %>
+                      <p class="text-xs text-gray-500 mt-1">
+                        <%= ride.created_at.strftime("%B %d, %Y at %I:%M %p") %>
+                      </p>
+                    </div>
+                    <div class="ml-4 flex items-center">
+                      <span class="px-3 py-1 text-sm font-medium rounded-full <%= ride.status == 'completed' ? 'bg-green-100 text-green-800' : ride.status == 'accepted' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800' %>">
+                        <%= ride.status.titleize %>
+                      </span>
+                      <% if ride.fare %>
+                        <span class="ml-4 text-lg font-bold text-gray-900">$<%= ride.fare %></span>
+                      <% end %>
+                    </div>
+                  </div>
+                </div>
+              <% end %>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="px-6 py-12 text-center">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+            </svg>
+            <p class="mt-4 text-gray-600">No rides yet</p>
+            <p class="text-sm text-gray-500 mt-2">Book your first ride to get started</p>
+            <%= link_to "Request a Ride", new_ride_path, class: "mt-4 inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 transition duration-150" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>
