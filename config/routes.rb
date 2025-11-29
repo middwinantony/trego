@@ -18,9 +18,63 @@ Rails.application.routes.draw do
   # Rides
   resources :rides, only: [:new, :create, :show, :index, :update]
 
+  # Payments
+  resources :payments, only: [:create] do
+    member do
+      post :refund
+    end
+  end
+
+  # Stripe webhooks
+  post '/webhooks/stripe', to: 'webhooks#stripe'
+
+  # Complaints
+  resources :complaints, only: [:index, :new, :create, :show]
+
+  # KYC Documents
+  resources :kyc_documents, only: [:index, :new, :create, :show]
+
+  # Earnings (for drivers)
+  resources :earnings, only: [:index]
+
   # Drivers
-  resources :drivers, only: [:index, :show, :update]
+  resources :drivers, only: [:index, :show, :update] do
+    member do
+      post :update_location
+    end
+  end
 
   # Dashboard
   get "/dashboard", to: "pages#dashboard"
+
+  # Admin namespace
+  namespace :admin do
+    root to: 'dashboard#index'
+    get 'dashboard', to: 'dashboard#index'
+
+    resources :drivers, only: [:index, :show] do
+      member do
+        post :approve
+        post :reject
+      end
+    end
+
+    resources :vehicles, only: [:index, :show] do
+      member do
+        post :approve
+        post :reject
+      end
+    end
+
+    resources :rides, only: [:index, :show]
+    resources :subscriptions, only: [:index, :show]
+    resources :complaints, only: [:index, :show, :update]
+
+    resources :kyc_documents, only: [:index, :show] do
+      member do
+        post :approve
+        post :reject
+      end
+    end
+  end
 end

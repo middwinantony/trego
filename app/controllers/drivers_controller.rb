@@ -32,6 +32,29 @@ class DriversController < ApplicationController
     end
   end
 
+  def update_location
+    if current_user && current_user.driver? && params[:latitude] && params[:longitude]
+      current_user.update(
+        current_latitude: params[:latitude],
+        current_longitude: params[:longitude]
+      )
+
+      # Broadcast location update to active rides
+      active_ride = current_user.rides_as_driver.active.first
+      if active_ride
+        RideChannel.broadcast_to(active_ride, {
+          type: 'driver_location',
+          latitude: params[:latitude],
+          longitude: params[:longitude]
+        })
+      end
+
+      render json: { success: true }
+    else
+      render json: { success: false, error: 'Unauthorized or missing parameters' }, status: :unauthorized
+    end
+  end
+
   private
 
   def set_driver

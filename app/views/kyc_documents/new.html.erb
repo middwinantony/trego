@@ -1,0 +1,113 @@
+<div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-2xl mx-auto">
+    <div class="mb-8">
+      <%= link_to kyc_documents_path, class: "text-sm text-indigo-600 hover:text-indigo-900 inline-flex items-center" do %>
+        <svg class="h-5 w-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        </svg>
+        Back to Documents
+      <% end %>
+      <h1 class="mt-4 text-3xl font-bold text-gray-900">Upload KYC Document</h1>
+      <p class="mt-2 text-gray-600">Upload a verification document for review</p>
+    </div>
+
+    <div class="bg-white shadow sm:rounded-lg">
+      <div class="px-4 py-5 sm:p-6">
+        <%= form_with(model: @kyc_document, local: true) do |f| %>
+          <% if @kyc_document.errors.any? %>
+            <div class="rounded-md bg-red-50 p-4 mb-6">
+              <div class="flex">
+                <div class="flex-shrink-0">
+                  <svg class="h-5 w-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                </div>
+                <div class="ml-3">
+                  <h3 class="text-sm font-medium text-red-800">
+                    There were <%= pluralize(@kyc_document.errors.count, "error") %> with your submission:
+                  </h3>
+                  <div class="mt-2 text-sm text-red-700">
+                    <ul class="list-disc pl-5 space-y-1">
+                      <% @kyc_document.errors.full_messages.each do |message| %>
+                        <li><%= message %></li>
+                      <% end %>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% end %>
+
+          <div class="space-y-6">
+            <!-- Document Type -->
+            <div>
+              <%= f.label :document_type, "Document Type", class: "block text-sm font-medium text-gray-700" %>
+              <%= f.select :document_type,
+                  options_for_select([
+                    ['Driver\'s License', 'drivers_license'],
+                    ['Passport', 'passport'],
+                    ['Vehicle Registration', 'vehicle_registration'],
+                    ['Vehicle Insurance', 'vehicle_insurance'],
+                    ['Proof of Address', 'proof_of_address']
+                  ]),
+                  { prompt: 'Select document type' },
+                  class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" %>
+            </div>
+
+            <!-- File Upload -->
+            <div>
+              <%= f.label :file, "Document File", class: "block text-sm font-medium text-gray-700" %>
+              <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:border-indigo-400 transition">
+                <div class="space-y-1 text-center">
+                  <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                  <div class="flex text-sm text-gray-600">
+                    <%= f.file_field :file,
+                        accept: "image/*,application/pdf",
+                        class: "sr-only",
+                        id: "file-upload",
+                        onchange: "document.getElementById('file-name').textContent = this.files[0] ? this.files[0].name : 'No file chosen'" %>
+                    <label for="file-upload" class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
+                      <span>Upload a file</span>
+                    </label>
+                    <p class="pl-1">or drag and drop</p>
+                  </div>
+                  <p class="text-xs text-gray-500">PNG, JPG, PDF up to 10MB</p>
+                  <p id="file-name" class="text-sm text-gray-700 font-medium">No file chosen</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Info Box -->
+            <div class="rounded-md bg-blue-50 p-4">
+              <div class="flex">
+                <div class="flex-shrink-0">
+                  <svg class="h-5 w-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                </div>
+                <div class="ml-3 flex-1">
+                  <h3 class="text-sm font-medium text-blue-800">Document Guidelines</h3>
+                  <div class="mt-2 text-sm text-blue-700">
+                    <ul class="list-disc pl-5 space-y-1">
+                      <li>Ensure the document is clear and all text is readable</li>
+                      <li>The entire document should be visible in the photo</li>
+                      <li>Documents must be current and not expired</li>
+                      <li>File size must be less than 10MB</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-6 flex justify-end space-x-3">
+            <%= link_to "Cancel", kyc_documents_path, class: "inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50" %>
+            <%= f.submit "Upload Document", class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

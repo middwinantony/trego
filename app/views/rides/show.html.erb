@@ -1,10 +1,299 @@
-<h1>Ride Details</h1>
+<div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-3xl mx-auto">
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+      <!-- Header -->
+      <div class="bg-indigo-600 px-6 py-4">
+        <h1 class="text-2xl font-bold text-white">Ride Details</h1>
+      </div>
 
-<p><strong>Rider:</strong> <%= @ride.rider.name %></p>
-<p><strong>Driver:</strong> <%= @ride.driver.name %></p>
-<p><strong>Pickup:</strong> <%= @ride.pickup %></p>
-<p><strong>Dropoff:</strong> <%= @ride.dropoff %></p>
-<p><strong>Status:</strong> <%= @ride.status %></p>
-<p><strong>Fare:</strong> $<%= @ride.fare %></p>
+      <!-- Content -->
+      <div class="px-6 py-6 space-y-6">
+        <!-- Ride Information -->
+        <div class="grid md:grid-cols-2 gap-6">
+          <div>
+            <h3 class="text-sm font-medium text-gray-500 mb-2">Rider</h3>
+            <p class="text-lg text-gray-900"><%= @ride.rider.name %></p>
+            <p class="text-sm text-gray-600"><%= @ride.rider.phone %></p>
+          </div>
 
-<%= link_to "Back to Rides", rides_path %>
+          <% if @ride.driver.present? %>
+            <div>
+              <h3 class="text-sm font-medium text-gray-500 mb-2">Driver</h3>
+              <p class="text-lg text-gray-900"><%= @ride.driver.name %></p>
+              <p class="text-sm text-gray-600"><%= @ride.driver.phone %></p>
+            </div>
+          <% else %>
+            <div>
+              <h3 class="text-sm font-medium text-gray-500 mb-2">Driver</h3>
+              <p class="text-lg text-gray-900">Not assigned yet</p>
+            </div>
+          <% end %>
+        </div>
+
+        <!-- Route Information -->
+        <div class="border-t border-gray-200 pt-6">
+          <div class="space-y-4">
+            <div class="flex items-start">
+              <div class="flex-shrink-0">
+                <svg class="h-6 w-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+              </div>
+              <div class="ml-3">
+                <h3 class="text-sm font-medium text-gray-500">Pickup Location</h3>
+                <p class="text-lg text-gray-900"><%= @ride.pickup %></p>
+              </div>
+            </div>
+
+            <div class="flex items-start">
+              <div class="flex-shrink-0">
+                <svg class="h-6 w-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+              </div>
+              <div class="ml-3">
+                <h3 class="text-sm font-medium text-gray-500">Dropoff Location</h3>
+                <p class="text-lg text-gray-900"><%= @ride.dropoff %></p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Status and Fare -->
+        <div class="border-t border-gray-200 pt-6 grid md:grid-cols-2 gap-6">
+          <div>
+            <h3 class="text-sm font-medium text-gray-500 mb-2">Status</h3>
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+              <%= case @ride.status
+                  when 'requested' then 'bg-yellow-100 text-yellow-800'
+                  when 'accepted' then 'bg-blue-100 text-blue-800'
+                  when 'in_progress' then 'bg-indigo-100 text-indigo-800'
+                  when 'completed' then 'bg-green-100 text-green-800'
+                  when 'cancelled' then 'bg-red-100 text-red-800'
+                  else 'bg-gray-100 text-gray-800'
+                  end %>">
+              <%= @ride.status.titleize %>
+            </span>
+          </div>
+
+          <div>
+            <h3 class="text-sm font-medium text-gray-500 mb-2">Fare</h3>
+            <p class="text-2xl font-bold text-gray-900">$<%= number_with_precision(@ride.fare, precision: 2) %></p>
+          </div>
+        </div>
+
+        <!-- Payment Section (for completed rides without payment) -->
+        <% if @ride.status == 'completed' && @ride.payment.nil? && current_user == @ride.rider %>
+          <div class="border-t border-gray-200 pt-6">
+            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+              <h3 class="text-lg font-semibold text-gray-900 mb-4">Payment Required</h3>
+              <p class="text-gray-600 mb-6">This ride has been completed. Please process your payment to finalize the transaction.</p>
+
+              <%= form_with url: payments_path, method: :post, id: "payment-form", local: true do |f| %>
+                <%= hidden_field_tag :ride_id, @ride.id %>
+
+                <div class="mb-4">
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Card Details</label>
+                  <div id="card-element" class="p-3 border border-gray-300 rounded-lg bg-white"></div>
+                  <div id="card-errors" class="text-red-600 text-sm mt-2"></div>
+                </div>
+
+                <div class="flex items-center justify-between">
+                  <div class="text-sm text-gray-600">
+                    <svg class="inline h-5 w-5 text-green-500 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                    </svg>
+                    Secure payment
+                  </div>
+                  <%= f.submit "Pay $#{number_with_precision(@ride.fare, precision: 2)}", class: "inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500", id: "submit-payment-button" %>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        <% elsif @ride.payment.present? %>
+          <div class="border-t border-gray-200 pt-6">
+            <div class="bg-green-50 border border-green-200 rounded-lg p-6">
+              <div class="flex items-center">
+                <svg class="h-6 w-6 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <div>
+                  <h3 class="text-lg font-semibold text-green-900">Payment Completed</h3>
+                  <p class="text-green-700">Amount: $<%= number_with_precision(@ride.payment.amount, precision: 2) %></p>
+                  <p class="text-sm text-green-600">Status: <%= @ride.payment.status.titleize %></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- Footer -->
+      <div class="bg-gray-50 px-6 py-4">
+        <%= link_to "← Back to Rides", rides_path, class: "text-indigo-600 hover:text-indigo-800 font-medium" %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Map Display -->
+<% if @ride.pickup_latitude && @ride.pickup_longitude && @ride.dropoff_latitude && @ride.dropoff_longitude %>
+  <div class="border-t border-gray-200 pt-6">
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">Route Map</h3>
+    <div id="map" class="w-full h-96 rounded-lg shadow-lg"></div>
+  </div>
+<% end %>
+
+<link href='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css' rel='stylesheet' />
+<script src='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js'></script>
+
+<% if @ride.pickup_latitude && @ride.pickup_longitude && @ride.dropoff_latitude && @ride.dropoff_longitude %>
+<script>
+  mapboxgl.accessToken = '<%= ENV['MAPBOX_ACCESS_TOKEN'] || 'pk.eyJ1IjoiZXhhbXBsZSIsImEiOiJjbGV4YW1wbGUifQ.example' %>';
+
+  const map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/streets-v12',
+    center: [<%= @ride.pickup_longitude %>, <%= @ride.pickup_latitude %>],
+    zoom: 12
+  });
+
+  // Add navigation controls
+  map.addControl(new mapboxgl.NavigationControl());
+
+  // Pickup marker (green)
+  new mapboxgl.Marker({ color: '#10B981' })
+    .setLngLat([<%= @ride.pickup_longitude %>, <%= @ride.pickup_latitude %>])
+    .setPopup(new mapboxgl.Popup().setHTML('<strong>Pickup:</strong><br><%= j @ride.pickup %>'))
+    .addTo(map);
+
+  // Dropoff marker (red)
+  new mapboxgl.Marker({ color: '#EF4444' })
+    .setLngLat([<%= @ride.dropoff_longitude %>, <%= @ride.dropoff_latitude %>])
+    .setPopup(new mapboxgl.Popup().setHTML('<strong>Dropoff:</strong><br><%= j @ride.dropoff %>'))
+    .addTo(map);
+
+  // Fit map to show both markers
+  const bounds = new mapboxgl.LngLatBounds();
+  bounds.extend([<%= @ride.pickup_longitude %>, <%= @ride.pickup_latitude %>]);
+  bounds.extend([<%= @ride.dropoff_longitude %>, <%= @ride.dropoff_latitude %>]);
+  map.fitBounds(bounds, { padding: 50 });
+
+  // Draw route line
+  map.on('load', () => {
+    map.addSource('route', {
+      'type': 'geojson',
+      'data': {
+        'type': 'Feature',
+        'geometry': {
+          'type': 'LineString',
+          'coordinates': [
+            [<%= @ride.pickup_longitude %>, <%= @ride.pickup_latitude %>],
+            [<%= @ride.dropoff_longitude %>, <%= @ride.dropoff_latitude %>]
+          ]
+        }
+      }
+    });
+
+    map.addLayer({
+      'id': 'route',
+      'type': 'line',
+      'source': 'route',
+      'layout': {
+        'line-join': 'round',
+        'line-cap': 'round'
+      },
+      'paint': {
+        'line-color': '#4F46E5',
+        'line-width': 4
+      }
+    });
+  });
+
+  // Real-time driver location updates (for active rides)
+  <% if @ride.status == 'in_progress' && current_user == @ride.rider %>
+    const driverMarker = new mapboxgl.Marker({ color: '#3B82F6' })
+      .setLngLat([<%= @ride.pickup_longitude %>, <%= @ride.pickup_latitude %>])
+      .setPopup(new mapboxgl.Popup().setHTML('<strong>Driver Location</strong>'))
+      .addTo(map);
+
+    // Subscribe to ride channel for location updates
+    import('@rails/actioncable').then(({ createConsumer }) => {
+      const consumer = createConsumer();
+      consumer.subscriptions.create(
+        { channel: 'RideChannel', ride_id: <%= @ride.id %> },
+        {
+          received(data) {
+            if (data.type === 'driver_location') {
+              driverMarker.setLngLat([data.longitude, data.latitude]);
+            }
+          }
+        }
+      );
+    });
+  <% end %>
+</script>
+<% end %>
+
+<% if @ride.status == 'completed' && @ride.payment.nil? && current_user == @ride.rider %>
+  <script src="https://js.stripe.com/v3/"></script>
+  <script>
+    const stripe = Stripe('<%= Rails.configuration.stripe[:publishable_key] %>');
+    const elements = stripe.elements();
+    const cardElement = elements.create('card', {
+      style: {
+        base: {
+          fontSize: '16px',
+          color: '#32325d',
+          fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+          '::placeholder': {
+            color: '#aab7c4'
+          }
+        },
+        invalid: {
+          color: '#fa755a',
+          iconColor: '#fa755a'
+        }
+      }
+    });
+
+    cardElement.mount('#card-element');
+
+    cardElement.on('change', function(event) {
+      const displayError = document.getElementById('card-errors');
+      if (event.error) {
+        displayError.textContent = event.error.message;
+      } else {
+        displayError.textContent = '';
+      }
+    });
+
+    const form = document.getElementById('payment-form');
+    const submitButton = document.getElementById('submit-payment-button');
+
+    form.addEventListener('submit', async function(event) {
+      event.preventDefault();
+
+      submitButton.disabled = true;
+      submitButton.textContent = 'Processing...';
+
+      const {token, error} = await stripe.createToken(cardElement);
+
+      if (error) {
+        const errorElement = document.getElementById('card-errors');
+        errorElement.textContent = error.message;
+        submitButton.disabled = false;
+        submitButton.textContent = 'Pay $<%= number_with_precision(@ride.fare, precision: 2) %>';
+      } else {
+        const hiddenInput = document.createElement('input');
+        hiddenInput.setAttribute('type', 'hidden');
+        hiddenInput.setAttribute('name', 'stripeToken');
+        hiddenInput.setAttribute('value', token.id);
+        form.appendChild(hiddenInput);
+        form.submit();
+      }
+    });
+  </script>
+<% end %>

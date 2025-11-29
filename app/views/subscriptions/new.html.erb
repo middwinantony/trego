@@ -9,7 +9,7 @@
       </p>
     </div>
 
-    <%= form_with(model: @subscription, url: subscriptions_path, class: "space-y-8") do |f| %>
+    <%= form_with(model: @subscription, url: subscriptions_path, class: "space-y-8", id: "subscription-form") do |f| %>
       <div class="grid md:grid-cols-2 gap-8">
         <!-- Weekly Plan -->
         <label class="cursor-pointer">
@@ -103,8 +103,28 @@
         </label>
       </div>
 
+      <!-- Payment Information -->
+      <div class="max-w-xl mx-auto bg-white rounded-xl shadow-lg p-8">
+        <h3 class="text-2xl font-bold text-gray-900 mb-6">Payment Information</h3>
+
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Card Details</label>
+          <div id="card-element" class="p-3 border border-gray-300 rounded-lg"></div>
+          <div id="card-errors" class="text-red-600 text-sm mt-2"></div>
+        </div>
+
+        <div class="text-sm text-gray-600 mb-4">
+          <p class="flex items-center">
+            <svg class="h-5 w-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+            </svg>
+            Your payment information is secure and encrypted
+          </p>
+        </div>
+      </div>
+
       <div class="text-center">
-        <%= f.submit "Activate Subscription", class: "inline-flex items-center px-8 py-4 border border-transparent text-lg font-medium rounded-xl text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out shadow-lg" %>
+        <%= f.submit "Activate Subscription", class: "inline-flex items-center px-8 py-4 border border-transparent text-lg font-medium rounded-xl text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out shadow-lg", id: "submit-button" %>
       </div>
 
       <p class="text-center text-sm text-gray-600 mt-4">
@@ -113,3 +133,62 @@
     <% end %>
   </div>
 </div>
+
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+  const stripe = Stripe('<%= Rails.configuration.stripe[:publishable_key] %>');
+  const elements = stripe.elements();
+  const cardElement = elements.create('card', {
+    style: {
+      base: {
+        fontSize: '16px',
+        color: '#32325d',
+        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+        '::placeholder': {
+          color: '#aab7c4'
+        }
+      },
+      invalid: {
+        color: '#fa755a',
+        iconColor: '#fa755a'
+      }
+    }
+  });
+
+  cardElement.mount('#card-element');
+
+  cardElement.on('change', function(event) {
+    const displayError = document.getElementById('card-errors');
+    if (event.error) {
+      displayError.textContent = event.error.message;
+    } else {
+      displayError.textContent = '';
+    }
+  });
+
+  const form = document.getElementById('subscription-form');
+  const submitButton = document.getElementById('submit-button');
+
+  form.addEventListener('submit', async function(event) {
+    event.preventDefault();
+
+    submitButton.disabled = true;
+    submitButton.textContent = 'Processing...';
+
+    const {token, error} = await stripe.createToken(cardElement);
+
+    if (error) {
+      const errorElement = document.getElementById('card-errors');
+      errorElement.textContent = error.message;
+      submitButton.disabled = false;
+      submitButton.textContent = 'Activate Subscription';
+    } else {
+      const hiddenInput = document.createElement('input');
+      hiddenInput.setAttribute('type', 'hidden');
+      hiddenInput.setAttribute('name', 'stripeToken');
+      hiddenInput.setAttribute('value', token.id);
+      form.appendChild(hiddenInput);
+      form.submit();
+    }
+  });
+</script>

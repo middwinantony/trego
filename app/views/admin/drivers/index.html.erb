@@ -1,0 +1,87 @@
+<div class="min-h-screen bg-gray-50">
+  <!-- Admin Navigation -->
+  <%= render partial: 'admin/shared/nav', locals: { active: 'drivers' } %>
+
+  <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="md:flex md:items-center md:justify-between mb-6">
+      <div class="flex-1 min-w-0">
+        <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+          Drivers Management
+        </h2>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="bg-white shadow rounded-lg mb-6">
+      <div class="px-4 py-5 sm:p-6">
+        <div class="flex space-x-4">
+          <%= link_to "All Drivers", admin_drivers_path, class: "inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md #{params[:status].blank? ? 'bg-indigo-600 text-white' : 'text-gray-700 bg-white hover:bg-gray-50'}" %>
+          <%= link_to "Pending Approval", admin_drivers_path(status: 'pending'), class: "inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md #{params[:status] == 'pending' ? 'bg-indigo-600 text-white' : 'text-gray-700 bg-white hover:bg-gray-50'}" %>
+          <%= link_to "Approved", admin_drivers_path(status: 'approved'), class: "inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md #{params[:status] == 'approved' ? 'bg-indigo-600 text-white' : 'text-gray-700 bg-white hover:bg-gray-50'}" %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Drivers List -->
+    <div class="bg-white shadow overflow-hidden sm:rounded-md">
+      <ul class="divide-y divide-gray-200">
+        <% @drivers.each do |driver| %>
+          <li>
+            <div class="px-4 py-4 sm:px-6">
+              <div class="flex items-center justify-between">
+                <div class="flex-1">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                      <div class="h-12 w-12 rounded-full bg-indigo-600 flex items-center justify-center">
+                        <span class="text-lg font-medium text-white"><%= driver.name[0].upcase %></span>
+                      </div>
+                    </div>
+                    <div class="ml-4">
+                      <h3 class="text-lg font-medium text-gray-900"><%= driver.name %></h3>
+                      <div class="flex items-center space-x-4 mt-1">
+                        <p class="text-sm text-gray-500"><%= driver.email %></p>
+                        <p class="text-sm text-gray-500"><%= driver.phone %></p>
+                      </div>
+                      <div class="flex items-center space-x-2 mt-2">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                          <%= driver.approved? ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' %>">
+                          <%= driver.approved? ? 'Approved' : 'Pending' %>
+                        </span>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                          <%= driver.available? ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800' %>">
+                          <%= driver.available? ? 'Online' : 'Offline' %>
+                        </span>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                          <%= case driver.kyc_status
+                              when 'approved' then 'bg-green-100 text-green-800'
+                              when 'submitted' then 'bg-blue-100 text-blue-800'
+                              when 'rejected' then 'bg-red-100 text-red-800'
+                              else 'bg-gray-100 text-gray-800'
+                              end %>">
+                          KYC: <%= driver.kyc_status.titleize %>
+                        </span>
+                        <% if driver.has_active_subscription? %>
+                          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            Active Subscription
+                          </span>
+                        <% end %>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="flex space-x-2">
+                  <%= link_to "View", admin_driver_path(driver), class: "inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50" %>
+                  <% unless driver.approved? %>
+                    <%= button_to "Approve", approve_admin_driver_path(driver), method: :post, class: "inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-green-600 hover:bg-green-700", form: { data: { turbo: false } } %>
+                    <%= button_to "Reject", reject_admin_driver_path(driver), method: :post, class: "inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-red-600 hover:bg-red-700", form: { data: { turbo: false } } %>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,67 @@
+<div class="min-h-screen bg-gray-50">
+  <%= render partial: 'admin/shared/nav', locals: { active: 'kyc' } %>
+
+  <div class="max-w-4xl mx-auto py-6 sm:px-6 lg:px-8">
+    <%= link_to admin_kyc_documents_path, class: "text-sm text-indigo-600 hover:text-indigo-900 mb-4 inline-flex items-center" do %>
+      <svg class="h-5 w-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+      </svg>
+      Back to KYC Documents
+    <% end %>
+
+    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+      <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
+        <div>
+          <h3 class="text-lg leading-6 font-medium text-gray-900"><%= @kyc_document.document_type.titleize.gsub('_', ' ') %></h3>
+          <p class="mt-1 max-w-2xl text-sm text-gray-500">Document review and approval</p>
+        </div>
+        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+          <%= case @kyc_document.status
+              when 'approved' then 'bg-green-100 text-green-800'
+              when 'rejected' then 'bg-red-100 text-red-800'
+              else 'bg-yellow-100 text-yellow-800'
+              end %>">
+          <%= @kyc_document.status.titleize %>
+        </span>
+      </div>
+      <div class="border-t border-gray-200">
+        <dl>
+          <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <dt class="text-sm font-medium text-gray-500">Driver</dt>
+            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+              <%= link_to @kyc_document.user.name, admin_driver_path(@kyc_document.user), class: "text-indigo-600 hover:text-indigo-900" %>
+            </dd>
+          </div>
+          <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <dt class="text-sm font-medium text-gray-500">Document Type</dt>
+            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @kyc_document.document_type.titleize.gsub('_', ' ') %></dd>
+          </div>
+          <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <dt class="text-sm font-medium text-gray-500">Submitted At</dt>
+            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @kyc_document.created_at.strftime('%B %d, %Y at %I:%M %p') %></dd>
+          </div>
+          <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <dt class="text-sm font-medium text-gray-500">Document</dt>
+            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+              <% if @kyc_document.file.attached? %>
+                <% if @kyc_document.file.content_type.include?('image') %>
+                  <%= image_tag @kyc_document.file, class: "max-w-full h-auto rounded-lg shadow-lg" %>
+                <% else %>
+                  <%= link_to "Download Document", rails_blob_path(@kyc_document.file, disposition: "attachment"), class: "inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50" %>
+                <% end %>
+              <% else %>
+                <p class="text-gray-500">No file attached</p>
+              <% end %>
+            </dd>
+          </div>
+        </dl>
+      </div>
+      <% if @kyc_document.status == 'pending' %>
+        <div class="bg-gray-50 px-4 py-4 sm:px-6 flex justify-end space-x-3">
+          <%= button_to "Reject", reject_admin_kyc_document_path(@kyc_document), method: :post, class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700", data: { confirm: "Are you sure you want to reject this document?" }, form: { data: { turbo: false } } %>
+          <%= button_to "Approve", approve_admin_kyc_document_path(@kyc_document), method: :post, class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700", form: { data: { turbo: false } } %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,97 @@
+<div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-2xl mx-auto">
+    <div class="mb-8">
+      <%= link_to complaints_path, class: "text-sm text-indigo-600 hover:text-indigo-900 inline-flex items-center" do %>
+        <svg class="h-5 w-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        </svg>
+        Back to Complaints
+      <% end %>
+      <h1 class="mt-4 text-3xl font-bold text-gray-900">Submit a Complaint</h1>
+      <p class="mt-2 text-gray-600">Let us know about any issues you've experienced</p>
+    </div>
+
+    <div class="bg-white shadow sm:rounded-lg">
+      <div class="px-4 py-5 sm:p-6">
+        <%= form_with(model: @complaint, local: true) do |f| %>
+          <% if @complaint.errors.any? %>
+            <div class="rounded-md bg-red-50 p-4 mb-6">
+              <div class="flex">
+                <div class="flex-shrink-0">
+                  <svg class="h-5 w-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                </div>
+                <div class="ml-3">
+                  <h3 class="text-sm font-medium text-red-800">
+                    There were <%= pluralize(@complaint.errors.count, "error") %>:
+                  </h3>
+                  <div class="mt-2 text-sm text-red-700">
+                    <ul class="list-disc pl-5 space-y-1">
+                      <% @complaint.errors.full_messages.each do |message| %>
+                        <li><%= message %></li>
+                      <% end %>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% end %>
+
+          <div class="space-y-6">
+            <!-- Subject -->
+            <div>
+              <%= f.label :subject, "Subject", class: "block text-sm font-medium text-gray-700" %>
+              <%= f.text_field :subject,
+                  class: "mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm",
+                  placeholder: "Brief description of your issue" %>
+            </div>
+
+            <!-- Ride (Optional) -->
+            <div>
+              <%= f.label :ride_id, "Related Ride (Optional)", class: "block text-sm font-medium text-gray-700" %>
+              <%= f.collection_select :ride_id,
+                  current_user.driver? ? current_user.rides_as_driver : current_user.rides_as_rider,
+                  :id,
+                  ->(ride) { "Ride ##{ride.id} - #{ride.pickup} to #{ride.dropoff}" },
+                  { prompt: 'Select a ride if applicable' },
+                  class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" %>
+            </div>
+
+            <!-- Description -->
+            <div>
+              <%= f.label :description, "Description", class: "block text-sm font-medium text-gray-700" %>
+              <%= f.text_area :description,
+                  rows: 6,
+                  class: "mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm",
+                  placeholder: "Please provide detailed information about your complaint..." %>
+              <p class="mt-2 text-sm text-gray-500">Please be as specific as possible to help us resolve your issue quickly.</p>
+            </div>
+
+            <!-- Info Box -->
+            <div class="rounded-md bg-blue-50 p-4">
+              <div class="flex">
+                <div class="flex-shrink-0">
+                  <svg class="h-5 w-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                </div>
+                <div class="ml-3 flex-1">
+                  <h3 class="text-sm font-medium text-blue-800">What happens next?</h3>
+                  <div class="mt-2 text-sm text-blue-700">
+                    <p>Our support team will review your complaint and respond within 24-48 hours. You can track the status of your complaint from your dashboard.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-6 flex justify-end space-x-3">
+            <%= link_to "Cancel", complaints_path, class: "inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50" %>
+            <%= f.submit "Submit Complaint", class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

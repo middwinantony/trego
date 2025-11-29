@@ -1,0 +1,205 @@
+<div class="min-h-screen bg-gray-50">
+  <%= render partial: 'admin/shared/nav', locals: { active: 'drivers' } %>
+
+  <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <div class="md:flex md:items-center md:justify-between mb-6">
+      <div class="flex-1 min-w-0">
+        <%= link_to admin_drivers_path, class: "text-sm text-indigo-600 hover:text-indigo-900 mb-2 inline-flex items-center" do %>
+          <svg class="h-5 w-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+          </svg>
+          Back to Drivers
+        <% end %>
+        <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+          <%= @driver.name %>
+        </h2>
+      </div>
+      <div class="flex space-x-3">
+        <% unless @driver.approved? %>
+          <%= button_to "Approve Driver", approve_admin_driver_path(@driver), method: :post, class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700", form: { data: { turbo: false } } %>
+          <%= button_to "Reject Driver", reject_admin_driver_path(@driver), method: :post, class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700", form: { data: { turbo: false } } %>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <!-- Driver Info -->
+      <div class="lg:col-span-2 space-y-6">
+        <!-- Personal Information -->
+        <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+          <div class="px-4 py-5 sm:px-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Personal Information</h3>
+          </div>
+          <div class="border-t border-gray-200">
+            <dl>
+              <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                <dt class="text-sm font-medium text-gray-500">Full name</dt>
+                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @driver.name %></dd>
+              </div>
+              <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                <dt class="text-sm font-medium text-gray-500">Email</dt>
+                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @driver.email %></dd>
+              </div>
+              <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                <dt class="text-sm font-medium text-gray-500">Phone</dt>
+                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @driver.phone %></dd>
+              </div>
+              <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                <dt class="text-sm font-medium text-gray-500">Status</dt>
+                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= @driver.approved? ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' %>">
+                    <%= @driver.approved? ? 'Approved' : 'Pending' %>
+                  </span>
+                </dd>
+              </div>
+              <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                <dt class="text-sm font-medium text-gray-500">Availability</dt>
+                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= @driver.available? ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800' %>">
+                    <%= @driver.available? ? 'Online' : 'Offline' %>
+                  </span>
+                </dd>
+              </div>
+              <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                <dt class="text-sm font-medium text-gray-500">KYC Status</dt>
+                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                    <%= case @driver.kyc_status
+                        when 'approved' then 'bg-green-100 text-green-800'
+                        when 'submitted' then 'bg-blue-100 text-blue-800'
+                        when 'rejected' then 'bg-red-100 text-red-800'
+                        else 'bg-gray-100 text-gray-800'
+                        end %>">
+                    <%= @driver.kyc_status.titleize %>
+                  </span>
+                </dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+
+        <!-- Vehicle Information -->
+        <% if @driver.vehicle %>
+          <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+            <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
+              <h3 class="text-lg leading-6 font-medium text-gray-900">Vehicle Information</h3>
+              <%= link_to "View Vehicle", admin_vehicle_path(@driver.vehicle), class: "text-sm text-indigo-600 hover:text-indigo-900" %>
+            </div>
+            <div class="border-t border-gray-200">
+              <dl>
+                <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                  <dt class="text-sm font-medium text-gray-500">Make & Model</dt>
+                  <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @driver.vehicle.make %> <%= @driver.vehicle.model %></dd>
+                </div>
+                <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                  <dt class="text-sm font-medium text-gray-500">Plate Number</dt>
+                  <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @driver.vehicle.plate %></dd>
+                </div>
+                <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                  <dt class="text-sm font-medium text-gray-500">Color</dt>
+                  <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @driver.vehicle.color %></dd>
+                </div>
+              </dl>
+            </div>
+          </div>
+        <% end %>
+
+        <!-- Recent Rides -->
+        <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+          <div class="px-4 py-5 sm:px-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Recent Rides (<%= @rides.count %>)</h3>
+          </div>
+          <div class="border-t border-gray-200">
+            <ul class="divide-y divide-gray-200">
+              <% if @rides.any? %>
+                <% @rides.each do |ride| %>
+                  <li class="px-4 py-4 sm:px-6">
+                    <div class="flex items-center justify-between">
+                      <div>
+                        <p class="text-sm font-medium text-gray-900"><%= ride.rider.name %></p>
+                        <p class="text-sm text-gray-500"><%= ride.pickup %> → <%= ride.dropoff %></p>
+                        <p class="text-xs text-gray-400"><%= ride.created_at.strftime('%B %d, %Y at %I:%M %p') %></p>
+                      </div>
+                      <div class="flex items-center space-x-4">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                          <%= case ride.status
+                              when 'requested' then 'bg-yellow-100 text-yellow-800'
+                              when 'accepted' then 'bg-blue-100 text-blue-800'
+                              when 'in_progress' then 'bg-indigo-100 text-indigo-800'
+                              when 'completed' then 'bg-green-100 text-green-800'
+                              when 'cancelled' then 'bg-red-100 text-red-800'
+                              end %>">
+                          <%= ride.status.titleize %>
+                        </span>
+                        <%= link_to "View", admin_ride_path(ride), class: "text-sm text-indigo-600 hover:text-indigo-900" %>
+                      </div>
+                    </div>
+                  </li>
+                <% end %>
+              <% else %>
+                <li class="px-4 py-4 sm:px-6">
+                  <p class="text-sm text-gray-500 text-center">No rides yet</p>
+                </li>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="space-y-6">
+        <!-- Subscription Info -->
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+          <div class="px-4 py-5 sm:p-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Subscription</h3>
+            <% if @driver.current_subscription %>
+              <div class="space-y-3">
+                <div>
+                  <p class="text-sm text-gray-500">Plan</p>
+                  <p class="text-lg font-medium text-gray-900"><%= @driver.current_subscription.plan_type.titleize %></p>
+                </div>
+                <div>
+                  <p class="text-sm text-gray-500">Amount</p>
+                  <p class="text-lg font-medium text-gray-900">$<%= @driver.current_subscription.amount %></p>
+                </div>
+                <div>
+                  <p class="text-sm text-gray-500">Status</p>
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= @driver.current_subscription.active? ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' %>">
+                    <%= @driver.current_subscription.status.titleize %>
+                  </span>
+                </div>
+                <div>
+                  <p class="text-sm text-gray-500">Ends At</p>
+                  <p class="text-sm text-gray-900"><%= @driver.current_subscription.ends_at.strftime('%B %d, %Y') %></p>
+                </div>
+              </div>
+            <% else %>
+              <p class="text-sm text-gray-500">No active subscription</p>
+            <% end %>
+          </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+          <div class="px-4 py-5 sm:p-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Statistics</h3>
+            <div class="space-y-3">
+              <div>
+                <p class="text-sm text-gray-500">Total Rides</p>
+                <p class="text-2xl font-semibold text-gray-900"><%= @driver.rides_as_driver.count %></p>
+              </div>
+              <div>
+                <p class="text-sm text-gray-500">Completed</p>
+                <p class="text-2xl font-semibold text-green-600"><%= @driver.rides_as_driver.completed.count %></p>
+              </div>
+              <div>
+                <p class="text-sm text-gray-500">Total Earnings</p>
+                <p class="text-2xl font-semibold text-indigo-600">$<%= number_with_precision(@driver.total_earnings, precision: 2) %></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
