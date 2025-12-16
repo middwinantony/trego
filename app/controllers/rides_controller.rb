@@ -1,13 +1,36 @@
 class RidesController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_ride, only: [:show, :update]
+  before_action :set_ride, only: [:show, :update, :accept]
 
   def index
     # Show all rides for current user
     if current_user.role == "driver"
-      @rides = Ride.where(driver: current_user)
+      if params[:status] == 'requested'
+        # For drivers, show all requested rides in their area
+        @rides = Ride.where(status: 'requested', driver_id: nil).order(created_at: :desc)
+      else
+        @rides = Ride.where(driver: current_user).order(created_at: :desc)
+      end
     else
-      @rides = Ride.where(rider: current_user)
+      @rides = Ride.where(rider: current_user).order(created_at: :desc)
+    end
+
+    respond_to do |format|
+      format.html
+      format.json {
+        render json: @rides.includes(:rider, :driver).map { |ride|
+          {
+            id: ride.id,
+            pickup: ride.pickup,
+            dropoff: ride.dropoff,
+            fare: ride.fare,
+            status: ride.status,
+            rider_name: ride.rider.name,
+            driver_id: ride.driver_id,
+            created_at: ride.created_at
+          }
+        }
+      }
     end
   end
 
@@ -80,6 +103,51 @@ class RidesController < ApplicationController
       redirect_to @ride, notice: "Ride updated successfully"
     else
       render :show, alert: "Could not update ride"
+    end
+  end
+
+  def accept
+    unless current_user.driver?
+      redirect_to root_path, alert: "Only drivers can accept rides"
+      return
+    end
+
+    unless current_user.can_accept_rides?
+      redirect_to dashboard_path, alert: "You must have an active subscription and be approved to accept rides"
+      return
+    end
+
+    if @ride.status == 'requested'
+      @ride.driver = current_user
+      @ride.status = 'accepted'
+
+      if @ride.save
+        # Broadcast to customer
+        NotificationChannel.broadcast_to(@ride.rider, {
+          type: 'ride_accepted',
+          ride_id: @ride.id,
+          driver_name: current_user.name,
+          message: "Your ride has been accepted by #{current_user.name}"
+        })
+
+        # Broadcast update to all drivers (remove from available rides)
+        @ride.broadcast_update
+
+        respond_to do |format|
+          format.html { redirect_to @ride, notice: "Ride accepted successfully!" }
+          format.json { render json: { success: true, ride_id: @ride.id, message: "Ride accepted!" } }
+        end
+      else
+        respond_to do |format|
+          format.html { redirect_to dashboard_path, alert: "Could not accept ride" }
+          format.json { render json: { success: false, message: "Could not accept ride" }, status: :unprocessable_entity }
+        end
+      end
+    else
+      respond_to do |format|
+        format.html { redirect_to dashboard_path, alert: "This ride is no longer available" }
+        format.json { render json: { success: false, message: "Ride no longer available" }, status: :unprocessable_entity }
+      end
     end
   end
 

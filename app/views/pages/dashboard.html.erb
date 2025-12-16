@@ -59,6 +59,150 @@
         <% end %>
       </div>
 
+      <!-- Onboarding Checklist (for drivers not fully approved) -->
+      <% unless current_user.can_accept_rides? %>
+        <div class="mb-8">
+          <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="px-6 py-4 bg-gradient-to-r from-purple-500 to-indigo-600">
+              <h3 class="text-lg font-semibold text-white flex items-center">
+                <svg class="h-6 w-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                </svg>
+                Getting Started Checklist
+              </h3>
+              <p class="text-indigo-100 text-sm mt-1">Complete these steps to start accepting rides</p>
+            </div>
+            <div class="p-6 space-y-4">
+              <!-- Step 1: Subscription -->
+              <div class="flex items-start">
+                <div class="flex-shrink-0">
+                  <% if current_user.has_active_subscription? %>
+                    <div class="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center">
+                      <svg class="h-5 w-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                      </svg>
+                    </div>
+                  <% else %>
+                    <div class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
+                      <span class="text-gray-600 font-semibold">1</span>
+                    </div>
+                  <% end %>
+                </div>
+                <div class="ml-4 flex-1">
+                  <h4 class="text-sm font-semibold text-gray-900">Subscribe to a Plan</h4>
+                  <p class="text-sm text-gray-600 mt-1">Choose a weekly or monthly subscription to access the platform</p>
+                  <% unless current_user.has_active_subscription? %>
+                    <%= link_to "Subscribe Now →", new_subscription_path, class: "text-sm text-indigo-600 hover:text-indigo-800 font-medium mt-2 inline-block" %>
+                  <% else %>
+                    <p class="text-sm text-green-600 font-medium mt-1">✓ Completed</p>
+                  <% end %>
+                </div>
+              </div>
+
+              <!-- Step 2: Vehicle Registration -->
+              <div class="flex items-start">
+                <div class="flex-shrink-0">
+                  <% if current_user.vehicles.any? %>
+                    <div class="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center">
+                      <svg class="h-5 w-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                      </svg>
+                    </div>
+                  <% else %>
+                    <div class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
+                      <span class="text-gray-600 font-semibold">2</span>
+                    </div>
+                  <% end %>
+                </div>
+                <div class="ml-4 flex-1">
+                  <h4 class="text-sm font-semibold text-gray-900">Register Your Vehicle</h4>
+                  <p class="text-sm text-gray-600 mt-1">Add your vehicle information for verification</p>
+                  <% if current_user.vehicles.any? %>
+                    <% approved_vehicle = current_user.vehicles.approved.first %>
+                    <% if approved_vehicle %>
+                      <p class="text-sm text-green-600 font-medium mt-1">✓ Vehicle Approved: <%= approved_vehicle.make %> <%= approved_vehicle.model %></p>
+                    <% else %>
+                      <p class="text-sm text-yellow-600 font-medium mt-1">⏳ Vehicle Pending Approval</p>
+                    <% end %>
+                    <%= link_to "Manage Vehicles →", vehicles_path, class: "text-sm text-indigo-600 hover:text-indigo-800 font-medium mt-2 inline-block" %>
+                  <% else %>
+                    <%= link_to "Register Vehicle →", new_vehicle_path, class: "text-sm text-indigo-600 hover:text-indigo-800 font-medium mt-2 inline-block" %>
+                  <% end %>
+                </div>
+              </div>
+
+              <!-- Step 3: KYC Documents -->
+              <div class="flex items-start">
+                <div class="flex-shrink-0">
+                  <% if current_user.kyc_status == 'approved' %>
+                    <div class="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center">
+                      <svg class="h-5 w-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                      </svg>
+                    </div>
+                  <% else %>
+                    <div class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
+                      <span class="text-gray-600 font-semibold">3</span>
+                    </div>
+                  <% end %>
+                </div>
+                <div class="ml-4 flex-1">
+                  <h4 class="text-sm font-semibold text-gray-900">Upload KYC Documents</h4>
+                  <p class="text-sm text-gray-600 mt-1">Submit required documents for identity verification</p>
+                  <% if current_user.kyc_status == 'approved' %>
+                    <p class="text-sm text-green-600 font-medium mt-1">✓ Documents Approved</p>
+                  <% elsif current_user.kyc_status == 'pending' %>
+                    <p class="text-sm text-yellow-600 font-medium mt-1">⏳ Documents Under Review</p>
+                  <% else %>
+                    <%= link_to "Upload Documents →", new_kyc_document_path, class: "text-sm text-indigo-600 hover:text-indigo-800 font-medium mt-2 inline-block" %>
+                  <% end %>
+                </div>
+              </div>
+
+              <!-- Step 4: Admin Approval -->
+              <div class="flex items-start">
+                <div class="flex-shrink-0">
+                  <% if current_user.approved? %>
+                    <div class="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center">
+                      <svg class="h-5 w-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                      </svg>
+                    </div>
+                  <% else %>
+                    <div class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
+                      <span class="text-gray-600 font-semibold">4</span>
+                    </div>
+                  <% end %>
+                </div>
+                <div class="ml-4 flex-1">
+                  <h4 class="text-sm font-semibold text-gray-900">Admin Approval</h4>
+                  <p class="text-sm text-gray-600 mt-1">Wait for an admin to review and approve your account</p>
+                  <% if current_user.approved? %>
+                    <p class="text-sm text-green-600 font-medium mt-1">✓ Account Approved</p>
+                  <% else %>
+                    <p class="text-sm text-gray-600 mt-1">⏳ Waiting for admin review</p>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+
+            <% if current_user.can_accept_rides? %>
+              <div class="px-6 py-4 bg-green-50 border-t border-green-200">
+                <div class="flex items-center">
+                  <svg class="h-6 w-6 text-green-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  <div>
+                    <p class="text-green-900 font-semibold">All Set!</p>
+                    <p class="text-sm text-green-700">You can now start accepting rides</p>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+
       <!-- Driver Stats -->
       <div class="grid md:grid-cols-3 gap-6 mb-8">
         <div class="bg-white rounded-xl shadow-md p-6">
@@ -119,6 +263,52 @@
           </div>
         <% end %>
       </div>
+
+      <!-- Available Ride Requests -->
+      <% if current_user.can_accept_rides? && current_user.available? %>
+        <div class="bg-white rounded-xl shadow-md overflow-hidden mb-8" id="available-rides-container">
+          <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-indigo-500 to-purple-600">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-semibold text-white flex items-center">
+                <svg class="h-6 w-6 mr-2 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                </svg>
+                Available Ride Requests
+              </h3>
+              <span class="bg-white text-indigo-600 px-3 py-1 rounded-full text-sm font-bold" id="available-rides-count">0</span>
+            </div>
+          </div>
+          <div id="available-rides-list">
+            <div class="px-6 py-12 text-center text-gray-500" id="no-rides-message">
+              <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+              </svg>
+              <p class="mt-4">No ride requests at the moment</p>
+              <p class="text-sm mt-2">New requests will appear here in real-time</p>
+            </div>
+          </div>
+        </div>
+      <% elsif current_user.driver? %>
+        <div class="bg-gray-100 border-l-4 border-gray-400 p-6 rounded-lg mb-8">
+          <div class="flex items-center">
+            <svg class="h-8 w-8 text-gray-600 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <div class="flex-1">
+              <h3 class="text-lg font-semibold text-gray-900">Not Accepting Rides</h3>
+              <p class="text-gray-700">
+                <% if !current_user.has_active_subscription? %>
+                  You need an active subscription to accept rides.
+                <% elsif !current_user.approved? %>
+                  Your account needs to be approved by an admin.
+                <% elsif !current_user.available? %>
+                  Turn on availability to see ride requests.
+                <% end %>
+              </p>
+            </div>
+          </div>
+        </div>
+      <% end %>
 
       <!-- Recent Rides -->
       <div class="bg-white rounded-xl shadow-md overflow-hidden">
@@ -283,3 +473,166 @@
     </div>
   <% end %>
 </div>
+
+<% if current_user.driver? && current_user.can_accept_rides? && current_user.available? %>
+  <script>
+    // ActionCable subscription for ride notifications
+    const availableRides = new Map();
+
+    const notificationChannel = App.cable.subscriptions.create(
+      {
+        channel: "NotificationChannel"
+      },
+      {
+        received(data) {
+          console.log("Notification received:", data);
+
+          if (data.type === 'new_ride_request') {
+            addRideToAvailableList(data.ride);
+          } else if (data.type === 'ride_accepted' || data.type === 'ride_cancelled') {
+            removeRideFromAvailableList(data.ride_id);
+          }
+        }
+      }
+    );
+
+    function addRideToAvailableList(ride) {
+      if (availableRides.has(ride.id)) {
+        return; // Already showing this ride
+      }
+
+      availableRides.set(ride.id, ride);
+      updateAvailableRidesUI();
+    }
+
+    function removeRideFromAvailableList(rideId) {
+      if (availableRides.has(rideId)) {
+        availableRides.delete(rideId);
+        updateAvailableRidesUI();
+      }
+    }
+
+    function updateAvailableRidesUI() {
+      const listContainer = document.getElementById('available-rides-list');
+      const noRidesMessage = document.getElementById('no-rides-message');
+      const countBadge = document.getElementById('available-rides-count');
+
+      countBadge.textContent = availableRides.size;
+
+      if (availableRides.size === 0) {
+        listContainer.innerHTML = `
+          <div class="px-6 py-12 text-center text-gray-500" id="no-rides-message">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+            </svg>
+            <p class="mt-4">No ride requests at the moment</p>
+            <p class="text-sm mt-2">New requests will appear here in real-time</p>
+          </div>
+        `;
+      } else {
+        let html = '<div class="divide-y divide-gray-200">';
+        availableRides.forEach((ride, rideId) => {
+          html += `
+            <div class="p-6 bg-white hover:bg-gray-50 transition" id="ride-${rideId}">
+              <div class="flex items-start justify-between">
+                <div class="flex-1">
+                  <div class="flex items-center mb-2">
+                    <svg class="h-5 w-5 text-indigo-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    <span class="text-sm font-semibold text-gray-900">Pickup:</span>
+                    <span class="text-sm text-gray-700 ml-2">${ride.pickup}</span>
+                  </div>
+                  <div class="flex items-center mb-3">
+                    <svg class="h-5 w-5 text-purple-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    <span class="text-sm font-semibold text-gray-900">Dropoff:</span>
+                    <span class="text-sm text-gray-700 ml-2">${ride.dropoff}</span>
+                  </div>
+                  <div class="flex items-center text-sm text-gray-600">
+                    <svg class="h-5 w-5 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
+                    Customer: ${ride.rider_name}
+                  </div>
+                </div>
+                <div class="ml-6 flex flex-col items-end">
+                  <span class="text-2xl font-bold text-green-600 mb-3">$${ride.fare}</span>
+                  <button
+                    onclick="acceptRide(${rideId})"
+                    class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-6 py-2 rounded-lg transition duration-150 shadow-md hover:shadow-lg"
+                    id="accept-btn-${rideId}">
+                    Accept Ride
+                  </button>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+        html += '</div>';
+        listContainer.innerHTML = html;
+      }
+    }
+
+    function acceptRide(rideId) {
+      const button = document.getElementById(`accept-btn-${rideId}`);
+      button.disabled = true;
+      button.textContent = 'Accepting...';
+      button.classList.add('opacity-50', 'cursor-not-allowed');
+
+      fetch(`/rides/${rideId}/accept`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Show success message
+          const rideElement = document.getElementById(`ride-${rideId}`);
+          rideElement.innerHTML = `
+            <div class="text-center py-4">
+              <svg class="h-12 w-12 text-green-500 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <p class="text-green-600 font-semibold">Ride Accepted!</p>
+              <p class="text-sm text-gray-600 mt-1">Redirecting...</p>
+            </div>
+          `;
+          setTimeout(() => {
+            window.location.href = `/rides/${rideId}`;
+          }, 1500);
+        } else {
+          alert(data.message || 'Could not accept ride');
+          button.disabled = false;
+          button.textContent = 'Accept Ride';
+          button.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while accepting the ride');
+        button.disabled = false;
+        button.textContent = 'Accept Ride';
+        button.classList.remove('opacity-50', 'cursor-not-allowed');
+      });
+    }
+
+    // Load initial available rides on page load
+    fetch('/rides.json?status=requested')
+      .then(response => response.json())
+      .then(rides => {
+        rides.forEach(ride => {
+          if (ride.status === 'requested' && !ride.driver_id) {
+            addRideToAvailableList(ride);
+          }
+        });
+      })
+      .catch(error => console.error('Error loading initial rides:', error));
+  </script>
+<% end %>

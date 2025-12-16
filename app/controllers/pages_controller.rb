@@ -11,4 +11,5 @@ class PagesController < ApplicationController
       @rides = Ride.where(rider: current_user)
     end
   end
+
 end

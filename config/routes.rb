@@ -16,7 +16,14 @@ Rails.application.routes.draw do
   resources :subscriptions, only: [:new, :create, :index]
 
   # Rides
-  resources :rides, only: [:new, :create, :show, :index, :update]
+  resources :rides, only: [:new, :create, :show, :index, :update] do
+    member do
+      post :accept
+    end
+  end
+
+  # Vehicles
+  resources :vehicles
 
   # Payments
   resources :payments, only: [:create] do

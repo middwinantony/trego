@@ -1,0 +1,207 @@
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="mb-8">
+      <h2 class="text-3xl font-extrabold text-gray-900">
+        <%= current_user.driver? ? "My Rides" : "My Ride History" %>
+      </h2>
+      <p class="mt-2 text-gray-600">
+        <%= current_user.driver? ? "View all your completed and ongoing rides" : "View all your ride bookings" %>
+      </p>
+    </div>
+
+    <!-- Stats Summary -->
+    <div class="grid md:grid-cols-4 gap-6 mb-8">
+      <div class="bg-white rounded-xl shadow-md p-6">
+        <div class="flex items-center">
+          <div class="p-3 bg-blue-100 rounded-full">
+            <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+            </svg>
+          </div>
+          <div class="ml-4">
+            <p class="text-sm font-medium text-gray-600">Total</p>
+            <p class="text-2xl font-bold text-gray-900"><%= @rides.count %></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-md p-6">
+        <div class="flex items-center">
+          <div class="p-3 bg-yellow-100 rounded-full">
+            <svg class="h-6 w-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <div class="ml-4">
+            <p class="text-sm font-medium text-gray-600">Requested</p>
+            <p class="text-2xl font-bold text-gray-900"><%= @rides.where(status: 'requested').count %></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-md p-6">
+        <div class="flex items-center">
+          <div class="p-3 bg-indigo-100 rounded-full">
+            <svg class="h-6 w-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+          </div>
+          <div class="ml-4">
+            <p class="text-sm font-medium text-gray-600">In Progress</p>
+            <p class="text-2xl font-bold text-gray-900"><%= @rides.where(status: ['accepted', 'in_progress']).count %></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-md p-6">
+        <div class="flex items-center">
+          <div class="p-3 bg-green-100 rounded-full">
+            <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <div class="ml-4">
+            <p class="text-sm font-medium text-gray-600">Completed</p>
+            <p class="text-2xl font-bold text-gray-900"><%= @rides.where(status: 'completed').count %></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rides Table -->
+    <div class="bg-white rounded-xl shadow-md overflow-hidden">
+      <% if @rides.any? %>
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Date
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Route
+                </th>
+                <% if current_user.driver? %>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Customer
+                  </th>
+                <% else %>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Driver
+                  </th>
+                <% end %>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Status
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Fare
+                </th>
+                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <% @rides.each do |ride| %>
+                <tr class="hover:bg-gray-50 transition">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900"><%= ride.created_at.strftime("%b %d, %Y") %></div>
+                    <div class="text-xs text-gray-500"><%= ride.created_at.strftime("%I:%M %p") %></div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <div class="text-sm font-medium text-gray-900">
+                      <svg class="inline h-4 w-4 text-green-500 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                      </svg>
+                      <%= truncate(ride.pickup, length: 30) %>
+                    </div>
+                    <div class="text-sm text-gray-500 mt-1">
+                      <svg class="inline h-4 w-4 text-red-500 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                      </svg>
+                      <%= truncate(ride.dropoff, length: 30) %>
+                    </div>
+                  </td>
+                  <% if current_user.driver? %>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="flex items-center">
+                        <div class="flex-shrink-0 h-10 w-10 bg-indigo-100 rounded-full flex items-center justify-center">
+                          <span class="text-indigo-600 font-semibold"><%= ride.rider.name[0] %></span>
+                        </div>
+                        <div class="ml-3">
+                          <div class="text-sm font-medium text-gray-900"><%= ride.rider.name %></div>
+                          <div class="text-xs text-gray-500"><%= ride.rider.phone %></div>
+                        </div>
+                      </div>
+                    </td>
+                  <% else %>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <% if ride.driver %>
+                        <div class="flex items-center">
+                          <div class="flex-shrink-0 h-10 w-10 bg-purple-100 rounded-full flex items-center justify-center">
+                            <span class="text-purple-600 font-semibold"><%= ride.driver.name[0] %></span>
+                          </div>
+                          <div class="ml-3">
+                            <div class="text-sm font-medium text-gray-900"><%= ride.driver.name %></div>
+                            <div class="text-xs text-gray-500"><%= ride.driver.phone %></div>
+                          </div>
+                        </div>
+                      <% else %>
+                        <span class="text-sm text-gray-400">Not assigned</span>
+                      <% end %>
+                    </td>
+                  <% end %>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full
+                      <%= case ride.status
+                          when 'requested' then 'bg-yellow-100 text-yellow-800'
+                          when 'accepted' then 'bg-blue-100 text-blue-800'
+                          when 'in_progress' then 'bg-indigo-100 text-indigo-800'
+                          when 'completed' then 'bg-green-100 text-green-800'
+                          when 'cancelled' then 'bg-red-100 text-red-800'
+                          else 'bg-gray-100 text-gray-800'
+                          end %>">
+                      <%= ride.status.titleize %>
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm font-bold text-gray-900">$<%= number_with_precision(ride.fare, precision: 2) %></div>
+                    <% if ride.payment %>
+                      <div class="text-xs text-green-600">Paid</div>
+                    <% elsif ride.status == 'completed' %>
+                      <div class="text-xs text-yellow-600">Pending</div>
+                    <% end %>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <%= link_to "View", ride_path(ride), class: "text-indigo-600 hover:text-indigo-900 font-medium" %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <div class="px-6 py-12 text-center">
+          <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+          </svg>
+          <p class="mt-4 text-gray-600 font-medium">No rides yet</p>
+          <p class="text-sm text-gray-500 mt-2">
+            <%= current_user.driver? ? "Your rides will appear here once you start accepting them" : "Your ride history will appear here once you book your first ride" %>
+          </p>
+          <% unless current_user.driver? %>
+            <%= link_to "Request a Ride", new_ride_path, class: "mt-6 inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 transition duration-150" %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Navigation -->
+    <div class="mt-6">
+      <%= link_to "← Back to Dashboard", dashboard_path, class: "text-indigo-600 hover:text-indigo-800 font-medium" %>
+    </div>
+  </div>
+</div>

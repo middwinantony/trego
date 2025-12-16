@@ -84,6 +84,44 @@
           </div>
         </div>
 
+        <!-- Driver Actions -->
+        <% if current_user.driver? && @ride.driver == current_user %>
+          <div class="border-t border-gray-200 pt-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Driver Actions</h3>
+            <div class="flex gap-4">
+              <% if @ride.status == 'accepted' %>
+                <%= form_with url: ride_path(@ride), method: :patch, class: "flex-1" do |f| %>
+                  <%= f.hidden_field :status, value: 'in_progress' %>
+                  <%= f.submit "Start Ride", class: "w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-6 rounded-lg transition duration-150 shadow-md hover:shadow-lg flex items-center justify-center", data: { confirm: "Are you sure you want to start this ride?" } %>
+                <% end %>
+              <% elsif @ride.status == 'in_progress' %>
+                <%= form_with url: ride_path(@ride), method: :patch, class: "flex-1" do |f| %>
+                  <%= f.hidden_field :status, value: 'completed' %>
+                  <%= f.submit "Complete Ride", class: "w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-6 rounded-lg transition duration-150 shadow-md hover:shadow-lg flex items-center justify-center", data: { confirm: "Are you sure you want to complete this ride?" } %>
+                <% end %>
+              <% elsif @ride.status == 'completed' %>
+                <div class="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
+                  <svg class="h-8 w-8 text-green-500 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  <p class="text-green-900 font-medium">Ride Completed</p>
+                  <p class="text-sm text-green-700 mt-1">Waiting for customer payment</p>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+
+        <!-- Customer Cancel Button -->
+        <% if current_user.customer? && @ride.rider == current_user && ['requested', 'accepted'].include?(@ride.status) %>
+          <div class="border-t border-gray-200 pt-6">
+            <%= form_with url: ride_path(@ride), method: :patch, class: "flex justify-end" do |f| %>
+              <%= f.hidden_field :status, value: 'cancelled' %>
+              <%= f.submit "Cancel Ride", class: "bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-6 rounded-lg transition duration-150", data: { confirm: "Are you sure you want to cancel this ride?" } %>
+            <% end %>
+          </div>
+        <% end %>
+
         <!-- Payment Section (for completed rides without payment) -->
         <% if @ride.status == 'completed' && @ride.payment.nil? && current_user == @ride.rider %>
           <div class="border-t border-gray-200 pt-6">

@@ -4,7 +4,7 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
 
-  has_one :vehicle
+  has_many :vehicles
   has_many :subscriptions
   has_one :current_subscription, -> { active.order(created_at: :desc) }, class_name: 'Subscription'
 

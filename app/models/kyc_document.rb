@@ -7,7 +7,7 @@ class KycDocument < ApplicationRecord
 
   validates :document_type, presence: true, inclusion: { in: DOCUMENT_TYPES }
   validates :status, presence: true, inclusion: { in: STATUSES }
-  validates :file, attached: true, content_type: ['image/png', 'image/jpg', 'image/jpeg', 'application/pdf'],
+  validates :file, attached: true, content_type: ['image/png', 'image/jpeg', 'application/pdf'],
                   size: { less_than: 10.megabytes }
 
   scope :pending, -> { where(status: 'pending') }
