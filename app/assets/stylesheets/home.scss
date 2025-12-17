@@ -1,0 +1,12 @@
+.car-animation {
+  width: 120px;
+  position: absolute;
+  left: -150px;
+  animation: drive 1.8s ease-in-out forwards;
+}
+
+@keyframes drive{
+  to {
+    left: 110%;
+  }
+}
