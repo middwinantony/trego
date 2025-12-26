@@ -1,10 +1,11 @@
 class RidesController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_ride, only: [:show, :update, :accept]
+  before_action :set_ride, only: [:show, :update, :accept, :matching, :rate, :receipt]
 
+  # Screen 1: Rider Home - Interactive map with "Where to?" button
   def index
     # Show all rides for current user
-    if current_user.role == "driver"
+    if current_user.driver?
       if params[:status] == 'requested'
         # For drivers, show all requested rides in their area
         @rides = Ride.where(status: 'requested', driver_id: nil).order(created_at: :desc)
@@ -12,7 +13,9 @@ class RidesController < ApplicationController
         @rides = Ride.where(driver: current_user).order(created_at: :desc)
       end
     else
-      @rides = Ride.where(rider: current_user).order(created_at: :desc)
+      # For riders, show ride home screen
+      @saved_locations = current_user.saved_locations
+      @recent_rides = current_user.rides_as_rider.recent.limit(5)
     end
 
     respond_to do |format|
@@ -34,39 +37,107 @@ class RidesController < ApplicationController
     end
   end
 
+  # Screen 2: Search autocomplete (Turbo Frame)
+  def search
+    query = params[:q]
+    mapbox_service = MapboxService.new
+    @results = mapbox_service.geocode(query)
+    @saved_locations = current_user.saved_locations
+    @recent_destinations = current_user.recent_destinations
+
+    respond_to do |format|
+      format.turbo_stream
+      format.json { render json: @results }
+    end
+  end
+
+  # Screen 3: Ride Options - Show all ride types with pricing
   def new
-    @ride = Ride.new
-    # List available drivers with active subscriptions
-    @drivers = User.where(role: "driver", available: true).select do |driver|
-      driver.has_active_subscription?
+    @ride = Ride.new(pickup: params[:pickup], dropoff: params[:dropoff])
+
+    # Geocode locations if provided
+    if @ride.pickup.present? && @ride.dropoff.present?
+      @ride.geocode_locations
+
+      # Calculate pricing for all ride types
+      pricing_service = RidePricingService.new(@ride)
+      @ride_options = pricing_service.calculate_all_options
     end
   end
 
   def create
-    @ride = Ride.new(ride_params)
-    @ride.rider = current_user
+    @ride = current_user.rides_as_rider.build(ride_params)
     @ride.status = "requested"
+    @ride.requested_at = Time.current
 
     if @ride.save
-      # Calculate fare based on distance
+      # Calculate fare based on distance and ride type
       @ride.update(fare: @ride.calculate_fare)
 
       # Try to find and notify nearby drivers
       matching_service = RideMatchingService.new(@ride)
       drivers_notified = matching_service.notify_nearby_drivers
 
-      if drivers_notified > 0
-        redirect_to @ride, notice: "Ride requested successfully. #{drivers_notified} nearby drivers notified."
-      else
-        redirect_to @ride, notice: "Ride requested successfully. Waiting for available drivers."
-      end
+      # Redirect to matching screen (Screen 4)
+      redirect_to matching_ride_path(@ride)
     else
-      render :new, alert: "Could not create ride"
+      @ride_options = RidePricingService.new(@ride).calculate_all_options
+      render :new, status: :unprocessable_entity
     end
   end
 
+  # Screen 4: Matching - Animated "Finding your driver..." screen
+  def matching
+    # This screen subscribes to ActionCable for driver assignment
+    # Will auto-redirect to show when driver accepts
+  end
+
+  # Screens 5, 6, 7: Show appropriate screen based on ride status
   def show
-    # Show ride details
+    case @ride.status
+    when 'requested'
+      # Still matching - show matching screen
+      render :matching
+    when 'accepted'
+      # Screen 5: Driver Assigned
+      render :driver_assigned
+    when 'in_progress'
+      # Screen 6: During Ride - Already has map tracking
+      # Keep existing show view
+    when 'completed'
+      if @ride.rating.present?
+        # Already rated, show receipt
+        render :receipt
+      else
+        # Screen 7: Trip Completion - Rating & Tip
+        render :completion
+      end
+    when 'cancelled'
+      # Show cancellation details
+    end
+  end
+
+  # Handle rating submission from Screen 7
+  def rate
+    @rating = @ride.build_rating(rating_params)
+    @rating.rater = current_user
+    @rating.ratee = @ride.driver
+
+    if @rating.save
+      # Update payment with tip if provided
+      if params[:tip_amount].present? && @ride.payment
+        @ride.payment.update(tip_amount: params[:tip_amount])
+      end
+
+      redirect_to receipt_ride_path(@ride), notice: "Thank you for your rating!"
+    else
+      render :completion, status: :unprocessable_entity
+    end
+  end
+
+  # Receipt view
+  def receipt
+    # Show final receipt with fare breakdown
   end
 
   def update
@@ -158,6 +229,10 @@ class RidesController < ApplicationController
   end
 
   def ride_params
-    params.require(:ride).permit(:pickup, :dropoff, :status, :driver_id)
+    params.require(:ride).permit(:pickup, :dropoff, :status, :driver_id, :ride_type)
+  end
+
+  def rating_params
+    params.require(:rating).permit(:score, :comment)
   end
 end

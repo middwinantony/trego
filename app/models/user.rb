@@ -14,6 +14,9 @@ class User < ApplicationRecord
   has_many :rides_as_driver, class_name: 'Ride', foreign_key: 'driver_id'
   has_many :complaints
   has_many :kyc_documents
+  has_many :saved_locations
+  has_many :ratings_given, class_name: 'Rating', foreign_key: 'rater_id'
+  has_many :ratings_received, class_name: 'Rating', foreign_key: 'ratee_id'
 
   validates :role, presence: true, inclusion: { in: %w[customer driver admin] }
   validates :name, presence: true
@@ -91,5 +94,17 @@ class User < ApplicationRecord
       total_rides: rides.count,
       average_per_ride: rides.count > 0 ? (total_earnings / rides.count).round(2) : 0
     }
+  end
+
+  # Calculate average rating from ratings received
+  def average_rating
+    return 0 if ratings_received.empty?
+    (ratings_received.average(:score).to_f).round(1)
+  end
+
+  # Get recent destinations for rider
+  def recent_destinations
+    return [] unless customer?
+    rides_as_rider.recent.limit(10).pluck(:dropoff).uniq.compact
   end
 end

@@ -1,0 +1,88 @@
+<%# Screen 4: Matching - Animated "Finding your driver..." screen %>
+<div class="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100 flex items-center justify-center"
+     data-controller="matching"
+     data-matching-ride-id-value="<%= @ride.id %>">
+  <div class="max-w-md w-full px-6">
+    <!-- Animated Spinner -->
+    <div class="flex justify-center mb-8" data-matching-target="spinner">
+      <div class="relative">
+        <!-- Outer ring -->
+        <div class="w-32 h-32 border-8 border-indigo-200 rounded-full"></div>
+        <!-- Spinning ring -->
+        <div class="absolute top-0 left-0 w-32 h-32 border-8 border-t-indigo-600 border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin"></div>
+        <!-- Inner car icon -->
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+          <svg class="h-12 w-12 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Status Message -->
+    <div class="text-center mb-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-2" data-matching-target="message">
+        Finding your driver...
+      </h2>
+      <p class="text-gray-600">
+        We're matching you with a nearby driver
+      </p>
+    </div>
+
+    <!-- Ride Details Card -->
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+      <div class="space-y-4">
+        <div class="flex items-start space-x-3">
+          <div class="flex-shrink-0 h-3 w-3 rounded-full bg-green-500 mt-1.5"></div>
+          <div class="flex-1 min-w-0">
+            <p class="text-xs text-gray-500">Pickup</p>
+            <p class="text-sm font-medium text-gray-900 truncate"><%= @ride.pickup %></p>
+          </div>
+        </div>
+        <div class="flex items-start space-x-3">
+          <div class="flex-shrink-0 h-3 w-3 rounded-full bg-red-500 mt-1.5"></div>
+          <div class="flex-1 min-w-0">
+            <p class="text-xs text-gray-500">Dropoff</p>
+            <p class="text-sm font-medium text-gray-900 truncate"><%= @ride.dropoff %></p>
+          </div>
+        </div>
+        <div class="pt-4 border-t border-gray-200 flex items-center justify-between">
+          <div>
+            <p class="text-xs text-gray-500">Ride Type</p>
+            <p class="text-sm font-semibold text-gray-900"><%= @ride.ride_type.titleize %></p>
+          </div>
+          <div class="text-right">
+            <p class="text-xs text-gray-500">Estimated Fare</p>
+            <p class="text-lg font-bold text-gray-900">$<%= number_with_precision(@ride.fare, precision: 2) %></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cancel Button -->
+    <button data-action="click->matching#cancel"
+            class="w-full bg-white hover:bg-gray-50 text-gray-700 font-medium py-3 px-6 rounded-xl shadow transition border border-gray-300">
+      Cancel Request
+    </button>
+
+    <!-- Info Message -->
+    <div class="mt-6 text-center">
+      <p class="text-sm text-gray-500">
+        This usually takes less than a minute
+      </p>
+    </div>
+  </div>
+</div>
+
+<style>
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .animate-spin {
+    animation: spin 1s linear infinite;
+  }
+</style>

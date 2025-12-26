@@ -1,0 +1,138 @@
+<%# Receipt View - After rating submission %>
+<div class="min-h-screen bg-gray-50">
+  <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-2">Trip Receipt</h2>
+      <p class="text-gray-600"><%= @ride.created_at.strftime("%B %d, %Y at %I:%M %p") %></p>
+    </div>
+
+    <!-- Receipt Card -->
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-6">
+      <!-- Trip Details -->
+      <div class="p-6 border-b border-gray-200">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Trip Details</h3>
+        <div class="space-y-3">
+          <div class="flex items-start space-x-3">
+            <div class="h-3 w-3 rounded-full bg-green-500 mt-1.5"></div>
+            <div class="flex-1">
+              <p class="text-xs text-gray-500">Pickup</p>
+              <p class="text-sm text-gray-900"><%= @ride.pickup %></p>
+            </div>
+          </div>
+          <div class="flex items-start space-x-3">
+            <div class="h-3 w-3 rounded-full bg-red-500 mt-1.5"></div>
+            <div class="flex-1">
+              <p class="text-xs text-gray-500">Dropoff</p>
+              <p class="text-sm text-gray-900"><%= @ride.dropoff %></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 grid grid-cols-3 gap-4 text-sm">
+          <div>
+            <p class="text-gray-500">Distance</p>
+            <p class="font-semibold text-gray-900"><%= number_with_precision(@ride.distance, precision: 1) %> km</p>
+          </div>
+          <div>
+            <p class="text-gray-500">Duration</p>
+            <p class="font-semibold text-gray-900">
+              <% if @ride.started_at && @ride.completed_at %>
+                <%= ((Time.parse(@ride.completed_at.to_s) - Time.parse(@ride.started_at.to_s)) / 60).round %> min
+              <% else %>
+                N/A
+              <% end %>
+            </p>
+          </div>
+          <div>
+            <p class="text-gray-500">Ride Type</p>
+            <p class="font-semibold text-gray-900"><%= @ride.ride_type.titleize %></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Driver Info -->
+      <% if @ride.driver %>
+        <div class="p-6 border-b border-gray-200">
+          <h3 class="text-lg font-semibold text-gray-900 mb-3">Driver</h3>
+          <div class="flex items-center space-x-3">
+            <div class="flex-shrink-0 h-12 w-12 bg-indigo-100 rounded-full flex items-center justify-center">
+              <span class="text-lg font-bold text-indigo-600"><%= @ride.driver.name[0] %></span>
+            </div>
+            <div>
+              <p class="font-medium text-gray-900"><%= @ride.driver.name %></p>
+              <% if @ride.rating %>
+                <div class="flex items-center mt-1">
+                  <p class="text-sm text-gray-500">You rated:</p>
+                  <div class="flex ml-2">
+                    <% @ride.rating.score.times do %>
+                      <svg class="h-4 w-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                      </svg>
+                    <% end %>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+
+      <!-- Payment Breakdown -->
+      <div class="p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Payment Summary</h3>
+        <div class="space-y-2">
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-600">Base Fare</span>
+            <span class="text-gray-900">$<%= number_with_precision(@ride.payment&.base_fare || @ride.fare, precision: 2) %></span>
+          </div>
+          <% if @ride.payment && @ride.payment.tip_amount > 0 %>
+            <div class="flex justify-between text-sm">
+              <span class="text-gray-600">Tip</span>
+              <span class="text-gray-900">$<%= number_with_precision(@ride.payment.tip_amount, precision: 2) %></span>
+            </div>
+          <% end %>
+          <div class="pt-3 mt-3 border-t-2 border-gray-300 flex justify-between">
+            <span class="text-lg font-bold text-gray-900">Total Paid</span>
+            <span class="text-2xl font-bold text-gray-900">
+              $<%= number_with_precision(@ride.payment ? @ride.payment.total_amount : @ride.fare, precision: 2) %>
+            </span>
+          </div>
+        </div>
+
+        <% if @ride.payment %>
+          <div class="mt-4 pt-4 border-t border-gray-200">
+            <div class="flex justify-between text-sm text-gray-500">
+              <span>Payment Method</span>
+              <span>Card ending in ****</span>
+            </div>
+            <div class="flex justify-between text-sm text-gray-500 mt-1">
+              <span>Transaction ID</span>
+              <span class="font-mono"><%= @ride.payment.stripe_charge_id&.last(8) || 'N/A' %></span>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="space-y-3">
+      <%= link_to rides_path, class: "block w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-4 px-6 rounded-xl shadow-lg text-center transition" do %>
+        Done
+      <% end %>
+
+      <button onclick="window.print()"
+              class="block w-full bg-white hover:bg-gray-50 border-2 border-gray-300 text-gray-700 font-semibold py-4 px-6 rounded-xl shadow text-center transition">
+        Download / Print Receipt
+      </button>
+    </div>
+
+    <!-- Support Link -->
+    <div class="mt-6 text-center">
+      <p class="text-sm text-gray-600">
+        Need help?
+        <%= link_to "Contact Support", "#", class: "text-indigo-600 hover:text-indigo-800 font-medium" %>
+      </p>
+    </div>
+  </div>
+</div>

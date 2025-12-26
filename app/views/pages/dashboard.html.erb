@@ -1,17 +1,17 @@
-<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+<div class="min-h-screen bg-white">
   <!-- Navigation -->
-  <nav class="bg-white shadow-sm">
+  <nav class="bg-black shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between h-16">
         <div class="flex items-center">
           <%= link_to root_path do %>
-            <h1 class="text-3xl font-bold text-indigo-600">Trego</h1>
+            <h1 class="text-3xl font-bold text-white">Trego</h1>
           <% end %>
         </div>
         <div class="flex items-center space-x-4">
-          <%= link_to "Home", root_path, class: "text-gray-700 hover:text-indigo-600 font-medium" %>
-          <%= link_to "Dashboard", dashboard_path, class: "text-indigo-600 font-medium" %>
-          <%= button_to "Logout", destroy_user_session_path, method: :delete, class: "bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-lg transition duration-150" %>
+          <%= link_to "Home", root_path, class: "text-white hover:text-gray-300 font-medium" %>
+          <%= link_to "Dashboard", dashboard_path, class: "text-white font-medium" %>
+          <%= button_to "Logout", destroy_user_session_path, method: :delete, class: "bg-white hover:bg-gray-200 text-black font-medium py-2 px-4 rounded transition duration-150" %>
         </div>
       </div>
     </div>
@@ -28,32 +28,32 @@
       <!-- Subscription Status -->
       <div class="mb-8">
         <% if current_user.has_active_subscription? %>
-          <div class="bg-green-100 border-l-4 border-green-500 p-6 rounded-lg">
+          <div class="bg-gray-100 border-l-4 border-black p-6 rounded-lg">
             <div class="flex items-center">
-              <svg class="h-8 w-8 text-green-600 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="h-8 w-8 text-black mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
               <div class="flex-1">
-                <h3 class="text-lg font-semibold text-green-900">Subscription Active</h3>
-                <p class="text-green-700">
+                <h3 class="text-lg font-semibold text-black">Subscription Active</h3>
+                <p class="text-gray-700">
                   <%= Subscription::PLAN_TYPES[current_user.current_subscription.plan_type.to_sym][:name] %> Plan
                   - Expires on <%= current_user.current_subscription.ends_at.strftime("%B %d, %Y at %I:%M %p") %>
                 </p>
               </div>
-              <%= link_to "View Subscriptions", subscriptions_path, class: "bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition duration-150" %>
+              <%= link_to "View Subscriptions", subscriptions_path, class: "bg-black hover:bg-gray-800 text-white font-medium py-2 px-4 rounded-lg transition duration-150" %>
             </div>
           </div>
         <% else %>
-          <div class="bg-yellow-100 border-l-4 border-yellow-500 p-6 rounded-lg">
+          <div class="bg-gray-100 border-l-4 border-gray-600 p-6 rounded-lg">
             <div class="flex items-center">
-              <svg class="h-8 w-8 text-yellow-600 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="h-8 w-8 text-gray-700 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
               </svg>
               <div class="flex-1">
-                <h3 class="text-lg font-semibold text-yellow-900">No Active Subscription</h3>
-                <p class="text-yellow-700">Subscribe to start accepting rides</p>
+                <h3 class="text-lg font-semibold text-black">No Active Subscription</h3>
+                <p class="text-gray-700">Subscribe to start accepting rides</p>
               </div>
-              <%= link_to "Subscribe Now", new_subscription_path, class: "bg-yellow-600 hover:bg-yellow-700 text-white font-medium py-2 px-4 rounded-lg transition duration-150" %>
+              <%= link_to "Subscribe Now", new_subscription_path, class: "bg-black hover:bg-gray-800 text-white font-medium py-2 px-4 rounded-lg transition duration-150" %>
             </div>
           </div>
         <% end %>
@@ -63,22 +63,22 @@
       <% unless current_user.can_accept_rides? %>
         <div class="mb-8">
           <div class="bg-white rounded-xl shadow-md overflow-hidden">
-            <div class="px-6 py-4 bg-gradient-to-r from-purple-500 to-indigo-600">
+            <div class="px-6 py-4 bg-black">
               <h3 class="text-lg font-semibold text-white flex items-center">
                 <svg class="h-6 w-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
                 </svg>
                 Getting Started Checklist
               </h3>
-              <p class="text-indigo-100 text-sm mt-1">Complete these steps to start accepting rides</p>
+              <p class="text-gray-300 text-sm mt-1">Complete these steps to start accepting rides</p>
             </div>
             <div class="p-6 space-y-4">
               <!-- Step 1: Subscription -->
               <div class="flex items-start">
                 <div class="flex-shrink-0">
                   <% if current_user.has_active_subscription? %>
-                    <div class="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center">
-                      <svg class="h-5 w-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="h-8 w-8 rounded-full bg-black flex items-center justify-center">
+                      <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                       </svg>
                     </div>
@@ -92,9 +92,9 @@
                   <h4 class="text-sm font-semibold text-gray-900">Subscribe to a Plan</h4>
                   <p class="text-sm text-gray-600 mt-1">Choose a weekly or monthly subscription to access the platform</p>
                   <% unless current_user.has_active_subscription? %>
-                    <%= link_to "Subscribe Now →", new_subscription_path, class: "text-sm text-indigo-600 hover:text-indigo-800 font-medium mt-2 inline-block" %>
+                    <%= link_to "Subscribe Now →", new_subscription_path, class: "text-sm text-black hover:text-gray-700 font-medium mt-2 inline-block" %>
                   <% else %>
-                    <p class="text-sm text-green-600 font-medium mt-1">✓ Completed</p>
+                    <p class="text-sm text-black font-medium mt-1">✓ Completed</p>
                   <% end %>
                 </div>
               </div>
@@ -103,8 +103,8 @@
               <div class="flex items-start">
                 <div class="flex-shrink-0">
                   <% if current_user.vehicles.any? %>
-                    <div class="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center">
-                      <svg class="h-5 w-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="h-8 w-8 rounded-full bg-black flex items-center justify-center">
+                      <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                       </svg>
                     </div>
@@ -120,13 +120,13 @@
                   <% if current_user.vehicles.any? %>
                     <% approved_vehicle = current_user.vehicles.approved.first %>
                     <% if approved_vehicle %>
-                      <p class="text-sm text-green-600 font-medium mt-1">✓ Vehicle Approved: <%= approved_vehicle.make %> <%= approved_vehicle.model %></p>
+                      <p class="text-sm text-black font-medium mt-1">✓ Vehicle Approved: <%= approved_vehicle.make %> <%= approved_vehicle.model %></p>
                     <% else %>
-                      <p class="text-sm text-yellow-600 font-medium mt-1">⏳ Vehicle Pending Approval</p>
+                      <p class="text-sm text-gray-600 font-medium mt-1">⏳ Vehicle Pending Approval</p>
                     <% end %>
-                    <%= link_to "Manage Vehicles →", vehicles_path, class: "text-sm text-indigo-600 hover:text-indigo-800 font-medium mt-2 inline-block" %>
+                    <%= link_to "Manage Vehicles →", vehicles_path, class: "text-sm text-black hover:text-gray-700 font-medium mt-2 inline-block" %>
                   <% else %>
-                    <%= link_to "Register Vehicle →", new_vehicle_path, class: "text-sm text-indigo-600 hover:text-indigo-800 font-medium mt-2 inline-block" %>
+                    <%= link_to "Register Vehicle →", new_vehicle_path, class: "text-sm text-black hover:text-gray-700 font-medium mt-2 inline-block" %>
                   <% end %>
                 </div>
               </div>
@@ -135,8 +135,8 @@
               <div class="flex items-start">
                 <div class="flex-shrink-0">
                   <% if current_user.kyc_status == 'approved' %>
-                    <div class="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center">
-                      <svg class="h-5 w-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="h-8 w-8 rounded-full bg-black flex items-center justify-center">
+                      <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                       </svg>
                     </div>
@@ -150,11 +150,11 @@
                   <h4 class="text-sm font-semibold text-gray-900">Upload KYC Documents</h4>
                   <p class="text-sm text-gray-600 mt-1">Submit required documents for identity verification</p>
                   <% if current_user.kyc_status == 'approved' %>
-                    <p class="text-sm text-green-600 font-medium mt-1">✓ Documents Approved</p>
+                    <p class="text-sm text-black font-medium mt-1">✓ Documents Approved</p>
                   <% elsif current_user.kyc_status == 'pending' %>
-                    <p class="text-sm text-yellow-600 font-medium mt-1">⏳ Documents Under Review</p>
+                    <p class="text-sm text-gray-600 font-medium mt-1">⏳ Documents Under Review</p>
                   <% else %>
-                    <%= link_to "Upload Documents →", new_kyc_document_path, class: "text-sm text-indigo-600 hover:text-indigo-800 font-medium mt-2 inline-block" %>
+                    <%= link_to "Upload Documents →", new_kyc_document_path, class: "text-sm text-black hover:text-gray-700 font-medium mt-2 inline-block" %>
                   <% end %>
                 </div>
               </div>
@@ -163,8 +163,8 @@
               <div class="flex items-start">
                 <div class="flex-shrink-0">
                   <% if current_user.approved? %>
-                    <div class="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center">
-                      <svg class="h-5 w-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="h-8 w-8 rounded-full bg-black flex items-center justify-center">
+                      <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                       </svg>
                     </div>
@@ -178,7 +178,7 @@
                   <h4 class="text-sm font-semibold text-gray-900">Admin Approval</h4>
                   <p class="text-sm text-gray-600 mt-1">Wait for an admin to review and approve your account</p>
                   <% if current_user.approved? %>
-                    <p class="text-sm text-green-600 font-medium mt-1">✓ Account Approved</p>
+                    <p class="text-sm text-black font-medium mt-1">✓ Account Approved</p>
                   <% else %>
                     <p class="text-sm text-gray-600 mt-1">⏳ Waiting for admin review</p>
                   <% end %>
@@ -187,14 +187,14 @@
             </div>
 
             <% if current_user.can_accept_rides? %>
-              <div class="px-6 py-4 bg-green-50 border-t border-green-200">
+              <div class="px-6 py-4 bg-gray-100 border-t border-gray-200">
                 <div class="flex items-center">
-                  <svg class="h-6 w-6 text-green-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="h-6 w-6 text-black mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                   </svg>
                   <div>
-                    <p class="text-green-900 font-semibold">All Set!</p>
-                    <p class="text-sm text-green-700">You can now start accepting rides</p>
+                    <p class="text-black font-semibold">All Set!</p>
+                    <p class="text-sm text-gray-700">You can now start accepting rides</p>
                   </div>
                 </div>
               </div>
@@ -207,8 +207,8 @@
       <div class="grid md:grid-cols-3 gap-6 mb-8">
         <div class="bg-white rounded-xl shadow-md p-6">
           <div class="flex items-center">
-            <div class="p-3 bg-blue-100 rounded-full">
-              <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="p-3 bg-gray-100 rounded-full">
+              <svg class="h-8 w-8 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
               </svg>
             </div>
@@ -221,8 +221,8 @@
 
         <div class="bg-white rounded-xl shadow-md p-6">
           <div class="flex items-center">
-            <div class="p-3 bg-green-100 rounded-full">
-              <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="p-3 bg-gray-100 rounded-full">
+              <svg class="h-8 w-8 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
             </div>
@@ -235,8 +235,8 @@
 
         <div class="bg-white rounded-xl shadow-md p-6">
           <div class="flex items-center">
-            <div class="p-3 bg-purple-100 rounded-full">
-              <svg class="h-8 w-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="p-3 bg-gray-100 rounded-full">
+              <svg class="h-8 w-8 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
             </div>
@@ -258,7 +258,7 @@
             </span>
             <label class="relative inline-flex items-center cursor-pointer">
               <%= f.check_box :available, class: "sr-only peer", checked: current_user.available?, onchange: "this.form.submit()" %>
-              <div class="w-14 h-7 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-indigo-600"></div>
+              <div class="w-14 h-7 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-gray-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-black"></div>
             </label>
           </div>
         <% end %>
@@ -267,7 +267,7 @@
       <!-- Available Ride Requests -->
       <% if current_user.can_accept_rides? && current_user.available? %>
         <div class="bg-white rounded-xl shadow-md overflow-hidden mb-8" id="available-rides-container">
-          <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-indigo-500 to-purple-600">
+          <div class="px-6 py-4 border-b border-gray-200 bg-black">
             <div class="flex items-center justify-between">
               <h3 class="text-lg font-semibold text-white flex items-center">
                 <svg class="h-6 w-6 mr-2 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -275,7 +275,7 @@
                 </svg>
                 Available Ride Requests
               </h3>
-              <span class="bg-white text-indigo-600 px-3 py-1 rounded-full text-sm font-bold" id="available-rides-count">0</span>
+              <span class="bg-white text-black px-3 py-1 rounded-full text-sm font-bold" id="available-rides-count">0</span>
             </div>
           </div>
           <div id="available-rides-list">
@@ -331,7 +331,7 @@
                       </p>
                     </div>
                     <div class="ml-4 flex items-center">
-                      <span class="px-3 py-1 text-sm font-medium rounded-full <%= ride.status == 'completed' ? 'bg-green-100 text-green-800' : ride.status == 'accepted' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800' %>">
+                      <span class="px-3 py-1 text-sm font-medium rounded-full <%= ride.status == 'completed' ? 'bg-black text-white' : ride.status == 'accepted' ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-800' %>">
                         <%= ride.status.titleize %>
                       </span>
                       <% if ride.fare %>
@@ -365,11 +365,11 @@
       <!-- Quick Action -->
       <div class="mb-8">
         <%= link_to new_ride_path, class: "block" do %>
-          <div class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl shadow-lg p-8 text-white hover:shadow-xl transition duration-200 transform hover:-translate-y-1">
+          <div class="bg-black rounded-xl shadow-lg p-8 text-white hover:shadow-xl transition duration-200 transform hover:-translate-y-1">
             <div class="flex items-center justify-between">
               <div>
                 <h3 class="text-2xl font-bold mb-2">Request a Ride</h3>
-                <p class="text-indigo-100">Book your next ride in seconds</p>
+                <p class="text-gray-300">Book your next ride in seconds</p>
               </div>
               <svg class="h-16 w-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
@@ -383,8 +383,8 @@
       <div class="grid md:grid-cols-3 gap-6 mb-8">
         <div class="bg-white rounded-xl shadow-md p-6">
           <div class="flex items-center">
-            <div class="p-3 bg-blue-100 rounded-full">
-              <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="p-3 bg-gray-100 rounded-full">
+              <svg class="h-8 w-8 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
               </svg>
             </div>
@@ -397,8 +397,8 @@
 
         <div class="bg-white rounded-xl shadow-md p-6">
           <div class="flex items-center">
-            <div class="p-3 bg-green-100 rounded-full">
-              <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="p-3 bg-gray-100 rounded-full">
+              <svg class="h-8 w-8 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
             </div>
@@ -411,8 +411,8 @@
 
         <div class="bg-white rounded-xl shadow-md p-6">
           <div class="flex items-center">
-            <div class="p-3 bg-purple-100 rounded-full">
-              <svg class="h-8 w-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="p-3 bg-gray-100 rounded-full">
+              <svg class="h-8 w-8 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
             </div>
@@ -447,7 +447,7 @@
                       </p>
                     </div>
                     <div class="ml-4 flex items-center">
-                      <span class="px-3 py-1 text-sm font-medium rounded-full <%= ride.status == 'completed' ? 'bg-green-100 text-green-800' : ride.status == 'accepted' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800' %>">
+                      <span class="px-3 py-1 text-sm font-medium rounded-full <%= ride.status == 'completed' ? 'bg-black text-white' : ride.status == 'accepted' ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-800' %>">
                         <%= ride.status.titleize %>
                       </span>
                       <% if ride.fare %>
@@ -466,7 +466,7 @@
             </svg>
             <p class="mt-4 text-gray-600">No rides yet</p>
             <p class="text-sm text-gray-500 mt-2">Book your first ride to get started</p>
-            <%= link_to "Request a Ride", new_ride_path, class: "mt-4 inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 transition duration-150" %>
+            <%= link_to "Request a Ride", new_ride_path, class: "mt-4 inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-black hover:bg-gray-800 transition duration-150" %>
           </div>
         <% end %>
       </div>
@@ -537,7 +537,7 @@
               <div class="flex items-start justify-between">
                 <div class="flex-1">
                   <div class="flex items-center mb-2">
-                    <svg class="h-5 w-5 text-indigo-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="h-5 w-5 text-black mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                     </svg>
@@ -545,7 +545,7 @@
                     <span class="text-sm text-gray-700 ml-2">${ride.pickup}</span>
                   </div>
                   <div class="flex items-center mb-3">
-                    <svg class="h-5 w-5 text-purple-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="h-5 w-5 text-gray-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                     </svg>
@@ -560,10 +560,10 @@
                   </div>
                 </div>
                 <div class="ml-6 flex flex-col items-end">
-                  <span class="text-2xl font-bold text-green-600 mb-3">$${ride.fare}</span>
+                  <span class="text-2xl font-bold text-black mb-3">$${ride.fare}</span>
                   <button
                     onclick="acceptRide(${rideId})"
-                    class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-6 py-2 rounded-lg transition duration-150 shadow-md hover:shadow-lg"
+                    class="bg-black hover:bg-gray-800 text-white font-medium px-6 py-2 rounded-lg transition duration-150 shadow-md hover:shadow-lg"
                     id="accept-btn-${rideId}">
                     Accept Ride
                   </button>
@@ -597,10 +597,10 @@
           const rideElement = document.getElementById(`ride-${rideId}`);
           rideElement.innerHTML = `
             <div class="text-center py-4">
-              <svg class="h-12 w-12 text-green-500 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="h-12 w-12 text-black mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
-              <p class="text-green-600 font-semibold">Ride Accepted!</p>
+              <p class="text-black font-semibold">Ride Accepted!</p>
               <p class="text-sm text-gray-600 mt-1">Redirecting...</p>
             </div>
           `;

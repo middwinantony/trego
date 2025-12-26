@@ -31,10 +31,19 @@ Rails.application.routes.draw do
 
   # Rides
   resources :rides, only: [:new, :create, :show, :index, :update] do
+    collection do
+      get :search
+    end
     member do
       post :accept
+      get :matching
+      post :rate
+      get :receipt
     end
   end
+
+  # Saved Locations
+  resources :saved_locations, only: [:index, :create, :destroy]
 
   # Vehicles
   resources :vehicles

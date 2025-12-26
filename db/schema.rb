@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_12_08_211117) do
+ActiveRecord::Schema[7.1].define(version: 2025_12_26_180008) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -70,7 +70,23 @@ ActiveRecord::Schema[7.1].define(version: 2025_12_08_211117) do
     t.string "stripe_charge_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.decimal "tip_amount", precision: 10, scale: 2, default: "0.0", null: false
+    t.decimal "base_fare", precision: 10, scale: 2
     t.index ["ride_id"], name: "index_payments_on_ride_id"
+  end
+
+  create_table "ratings", force: :cascade do |t|
+    t.bigint "ride_id", null: false
+    t.bigint "rater_id", null: false
+    t.bigint "ratee_id", null: false
+    t.integer "score", null: false
+    t.text "comment"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["ratee_id", "created_at"], name: "index_ratings_on_ratee_id_and_created_at"
+    t.index ["ratee_id"], name: "index_ratings_on_ratee_id"
+    t.index ["rater_id"], name: "index_ratings_on_rater_id"
+    t.index ["ride_id"], name: "index_ratings_on_ride_id", unique: true
   end
 
   create_table "rides", force: :cascade do |t|
@@ -88,8 +104,29 @@ ActiveRecord::Schema[7.1].define(version: 2025_12_08_211117) do
     t.decimal "pickup_longitude"
     t.decimal "dropoff_latitude"
     t.decimal "dropoff_longitude"
+    t.string "ride_type", default: "economy", null: false
+    t.datetime "requested_at"
+    t.datetime "matched_at"
+    t.datetime "started_at"
+    t.datetime "completed_at"
+    t.integer "estimated_duration"
+    t.datetime "estimated_arrival"
     t.index ["driver_id"], name: "index_rides_on_driver_id"
+    t.index ["ride_type"], name: "index_rides_on_ride_type"
     t.index ["rider_id"], name: "index_rides_on_rider_id"
+  end
+
+  create_table "saved_locations", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "name", null: false
+    t.text "address", null: false
+    t.decimal "latitude", precision: 10, scale: 6, null: false
+    t.decimal "longitude", precision: 10, scale: 6, null: false
+    t.string "location_type", default: "custom", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "location_type"], name: "index_saved_locations_on_user_id_and_location_type"
+    t.index ["user_id"], name: "index_saved_locations_on_user_id"
   end
 
   create_table "subscriptions", force: :cascade do |t|
@@ -144,8 +181,12 @@ ActiveRecord::Schema[7.1].define(version: 2025_12_08_211117) do
   add_foreign_key "complaints", "users"
   add_foreign_key "kyc_documents", "users"
   add_foreign_key "payments", "rides"
+  add_foreign_key "ratings", "rides"
+  add_foreign_key "ratings", "users", column: "ratee_id"
+  add_foreign_key "ratings", "users", column: "rater_id"
   add_foreign_key "rides", "users", column: "driver_id"
   add_foreign_key "rides", "users", column: "rider_id"
+  add_foreign_key "saved_locations", "users"
   add_foreign_key "subscriptions", "users"
   add_foreign_key "vehicles", "users"
 end

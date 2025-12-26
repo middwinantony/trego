@@ -1,0 +1,4 @@
+<%# Turbo Stream response for search autocomplete %>
+<%= turbo_stream.update "search-results" do %>
+  <%= render partial: "rides/search", locals: { results: @results, saved_locations: @saved_locations, recent_destinations: @recent_destinations } %>
+<% end %>

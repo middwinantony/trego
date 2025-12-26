@@ -6,7 +6,14 @@ class RideMatchingService
   def find_drivers
     return [] unless @ride.pickup_latitude && @ride.pickup_longitude
 
-    User.nearby_drivers(@ride.pickup_latitude, @ride.pickup_longitude, 10)
+    drivers = User.nearby_drivers(@ride.pickup_latitude, @ride.pickup_longitude, 10)
+    filter_drivers_by_ride_type(drivers)
+  end
+
+  # Filter drivers based on ride type requirements
+  def find_drivers_for_type(ride_type)
+    @ride.ride_type = ride_type
+    find_drivers
   end
 
   def auto_assign_driver
@@ -57,5 +64,19 @@ class RideMatchingService
     end
 
     drivers.count
+  end
+
+  private
+
+  def filter_drivers_by_ride_type(drivers)
+    # For XL rides, we would filter for drivers with larger vehicles
+    # For now, return all drivers (in production, add vehicle capacity filtering)
+    case @ride.ride_type
+    when 'xl'
+      # In production: drivers.select { |d| d.vehicles.any? { |v| v.capacity >= 6 } }
+      drivers
+    else
+      drivers
+    end
   end
 end

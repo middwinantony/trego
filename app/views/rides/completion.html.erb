@@ -1,0 +1,191 @@
+<%# Screen 7: Trip Completion - Rating, Tip, and Receipt %>
+<div class="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <!-- Success Animation -->
+    <div class="text-center mb-8 animate-fade-in">
+      <div class="inline-flex items-center justify-center w-24 h-24 bg-green-100 rounded-full mb-6 animate-scale-in">
+        <svg class="h-12 w-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        </svg>
+      </div>
+      <h2 class="text-3xl font-bold text-gray-900 mb-2">Trip Completed!</h2>
+      <p class="text-gray-600">Hope you enjoyed your ride</p>
+    </div>
+
+    <!-- Trip Summary Card -->
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">Trip Summary</h3>
+
+      <!-- Map Thumbnail -->
+      <div class="bg-gray-100 rounded-lg h-32 mb-4 flex items-center justify-center">
+        <svg class="h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path>
+        </svg>
+      </div>
+
+      <!-- Trip Details -->
+      <div class="space-y-3">
+        <div class="flex items-start space-x-3">
+          <div class="h-3 w-3 rounded-full bg-green-500 mt-1.5 flex-shrink-0"></div>
+          <div class="flex-1">
+            <p class="text-xs text-gray-500">From</p>
+            <p class="text-sm font-medium text-gray-900"><%= @ride.pickup %></p>
+          </div>
+        </div>
+        <div class="flex items-start space-x-3">
+          <div class="h-3 w-3 rounded-full bg-red-500 mt-1.5 flex-shrink-0"></div>
+          <div class="flex-1">
+            <p class="text-xs text-gray-500">To</p>
+            <p class="text-sm font-medium text-gray-900"><%= @ride.dropoff %></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-4 pt-4 border-t border-gray-200 flex justify-between text-sm">
+        <div>
+          <p class="text-gray-500">Distance</p>
+          <p class="font-semibold text-gray-900"><%= number_with_precision(@ride.distance, precision: 1) %> km</p>
+        </div>
+        <div class="text-center">
+          <p class="text-gray-500">Duration</p>
+          <p class="font-semibold text-gray-900">
+            <% if @ride.started_at && @ride.completed_at %>
+              <%= ((Time.parse(@ride.completed_at.to_s) - Time.parse(@ride.started_at.to_s)) / 60).round %> min
+            <% else %>
+              N/A
+            <% end %>
+          </p>
+        </div>
+        <div class="text-right">
+          <p class="text-gray-500">Ride Type</p>
+          <p class="font-semibold text-gray-900"><%= @ride.ride_type.titleize %></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fare Breakdown -->
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">Fare Breakdown</h3>
+      <div class="space-y-3">
+        <div class="flex justify-between text-sm">
+          <span class="text-gray-600">Base Fare</span>
+          <span class="font-medium text-gray-900">$5.00</span>
+        </div>
+        <div class="flex justify-between text-sm">
+          <span class="text-gray-600">Distance (<%= number_with_precision(@ride.distance, precision: 1) %> km)</span>
+          <span class="font-medium text-gray-900">$<%= number_with_precision((@ride.distance || 0) * 2, precision: 2) %></span>
+        </div>
+        <div class="flex justify-between text-sm">
+          <span class="text-gray-600">Ride Type Multiplier (<%= @ride.ride_type.titleize %>)</span>
+          <span class="font-medium text-gray-900"><%= Ride::RIDE_TYPE_MULTIPLIERS[@ride.ride_type] %>x</span>
+        </div>
+        <div class="pt-3 border-t-2 border-gray-300 flex justify-between">
+          <span class="text-base font-semibold text-gray-900">Total Fare</span>
+          <span class="text-xl font-bold text-gray-900">$<%= number_with_precision(@ride.fare, precision: 2) %></span>
+        </div>
+      </div>
+    </div>
+
+    <%= form_with url: rate_ride_path(@ride), method: :post, data: { controller: "rating" } do |f| %>
+      <!-- Rating Section -->
+      <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Rate Your Driver</h3>
+
+        <div class="text-center mb-6">
+          <% if @ride.driver %>
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-indigo-100 rounded-full mb-3">
+              <span class="text-2xl font-bold text-indigo-600"><%= @ride.driver.name[0] %></span>
+            </div>
+            <p class="text-lg font-semibold text-gray-900"><%= @ride.driver.name %></p>
+          <% end %>
+        </div>
+
+        <!-- Star Rating -->
+        <div class="flex justify-center space-x-2 mb-4" data-rating-target="stars">
+          <% 5.times do |i| %>
+            <button type="button"
+                    data-rating-target="star"
+                    data-index="<%= i + 1 %>"
+                    data-action="mouseover->rating#hoverStar mouseout->rating#leaveStar click->rating#selectStar"
+                    class="focus:outline-none transition">
+              <svg class="h-12 w-12 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+              </svg>
+            </button>
+          <% end %>
+        </div>
+        <%= f.hidden_field :score, value: "", data: { "rating-target": "hiddenScore" } %>
+
+        <!-- Optional Comment -->
+        <div class="mt-4">
+          <%= f.text_area :comment,
+                          placeholder: "Add a comment (optional)",
+                          rows: 3,
+                          class: "w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" %>
+        </div>
+      </div>
+
+      <!-- Tip Section -->
+      <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Add a Tip</h3>
+
+        <div class="grid grid-cols-4 gap-3 mb-4">
+          <% [2, 5, 10, 15].each do |amount| %>
+            <button type="button"
+                    data-rating-target="tipButton"
+                    data-amount="<%= amount %>"
+                    data-action="click->rating#selectTip"
+                    class="bg-white border-2 border-gray-300 text-gray-700 font-semibold py-3 rounded-lg hover:border-indigo-500 transition">
+              $<%= amount %>
+            </button>
+          <% end %>
+        </div>
+
+        <div class="relative">
+          <span class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+          <input type="number"
+                 data-rating-target="customTipInput"
+                 data-action="input->rating#customTipChanged"
+                 placeholder="Custom amount"
+                 step="0.01"
+                 min="0"
+                 class="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+        </div>
+        <%= f.hidden_field :tip_amount, value: "0", data: { "rating-target": "hiddenTip" } %>
+
+        <p class="text-xs text-gray-500 mt-3 text-center">
+          100% of your tip goes to the driver
+        </p>
+      </div>
+
+      <!-- Submit Button -->
+      <%= f.submit "Submit Rating",
+                   class: "w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-6 rounded-xl shadow-lg transition" %>
+    <% end %>
+
+    <!-- Skip Link -->
+    <div class="mt-4 text-center">
+      <%= link_to "Skip for now", rides_path, class: "text-sm text-gray-600 hover:text-gray-900" %>
+    </div>
+  </div>
+</div>
+
+<style>
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes scale-in {
+    from { transform: scale(0); }
+    to { transform: scale(1); }
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.5s ease-out;
+  }
+
+  .animate-scale-in {
+    animation: scale-in 0.3s ease-out 0.2s both;
+  }
+</style>
