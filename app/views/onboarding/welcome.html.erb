@@ -1,0 +1,36 @@
+<div class="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+  <div class="max-w-md w-full bg-white rounded-3xl shadow-xl overflow-hidden" style="height: 667px;">
+    <!-- Content Container -->
+    <div class="h-full flex flex-col justify-between p-8">
+      <!-- Logo and Title -->
+      <div class="flex-1 flex flex-col items-center justify-center">
+        <div class="bg-blue-600 rounded-3xl p-6 mb-8">
+          <svg class="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/>
+          </svg>
+        </div>
+
+        <h1 class="text-3xl font-bold text-gray-900 mb-3 text-center">Welcome to Trego</h1>
+        <p class="text-gray-600 text-center mb-12">Fair, transparent, reliable rides</p>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="space-y-4">
+        <%= link_to "Continue as Rider", onboarding_phone_path(role: 'customer'),
+            class: "block w-full bg-blue-600 text-white text-center font-semibold py-4 rounded-2xl hover:bg-blue-700 transition duration-200" %>
+
+        <%= link_to "Continue as Driver", onboarding_phone_path(role: 'driver'),
+            class: "block w-full bg-white text-blue-600 border-2 border-blue-600 text-center font-semibold py-4 rounded-2xl hover:bg-gray-50 transition duration-200" %>
+      </div>
+
+      <!-- Terms -->
+      <div class="mt-6">
+        <p class="text-xs text-gray-500 text-center">
+          By continuing, you agree to our
+          <%= link_to "Terms of Service", "#", class: "underline" %> and
+          <%= link_to "Privacy Policy", "#", class: "underline" %>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

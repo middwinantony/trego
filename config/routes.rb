@@ -3,6 +3,20 @@ Rails.application.routes.draw do
     registrations: 'users/registrations'
   }
 
+  # Onboarding routes
+  get '/onboarding/welcome', to: 'onboarding#welcome', as: :onboarding_welcome
+  get '/onboarding/phone', to: 'onboarding#phone', as: :onboarding_phone
+  post '/onboarding/send_code', to: 'onboarding#send_code', as: :onboarding_send_code
+  get '/onboarding/verify_code', to: 'onboarding#verify_code', as: :onboarding_verify_code
+  post '/onboarding/verify_code', to: 'onboarding#check_code'
+  post '/onboarding/resend_code', to: 'onboarding#resend_code', as: :onboarding_resend_code
+  get '/onboarding/profile', to: 'onboarding#profile', as: :onboarding_profile
+  post '/onboarding/profile', to: 'onboarding#create_profile', as: :onboarding_create_profile
+  get '/onboarding/permissions', to: 'onboarding#permissions', as: :onboarding_permissions
+  post '/onboarding/permissions', to: 'onboarding#save_permissions', as: :onboarding_save_permissions
+  get '/onboarding/documents', to: 'onboarding#documents', as: :onboarding_documents
+  get '/onboarding/complete', to: 'onboarding#complete', as: :onboarding_complete
+
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
@@ -10,7 +24,7 @@ Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
 
   # Defines the root path route ("/")
-  root 'pages#home'
+  root 'onboarding#welcome'
 
   # Subscriptions
   resources :subscriptions, only: [:new, :create, :index]

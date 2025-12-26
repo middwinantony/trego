@@ -1,0 +1,82 @@
+<div class="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+  <div class="max-w-md w-full bg-white rounded-3xl shadow-xl overflow-hidden" style="height: 667px;">
+    <div class="h-full flex flex-col p-8">
+      <!-- Back Button -->
+      <%= link_to onboarding_phone_path(role: session[:onboarding_role]), class: "inline-flex items-center text-gray-700 hover:text-gray-900 mb-8" do %>
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+      <% end %>
+
+      <!-- Title -->
+      <h2 class="text-2xl font-bold text-gray-900 mb-2">Enter verification code</h2>
+      <p class="text-gray-600 mb-8">We sent a code to your phone number</p>
+
+      <!-- Code Input -->
+      <%= form_with url: onboarding_verify_code_path, method: :post, class: "flex-1", id: "verify-form" do |f| %>
+        <div class="flex justify-between mb-6" id="code-inputs">
+          <% 6.times do |i| %>
+            <%= text_field_tag "code_#{i}", nil,
+                maxlength: 1,
+                class: "w-14 h-14 text-center text-2xl font-bold bg-gray-100 border-0 rounded-xl text-gray-900 focus:ring-2 focus:ring-blue-600 focus:bg-white transition",
+                inputmode: "numeric",
+                pattern: "[0-9]" %>
+          <% end %>
+        </div>
+
+        <%= hidden_field_tag :verification_code, "", id: "verification-code-hidden" %>
+
+        <div class="text-center mb-8">
+          <%= link_to "Resend code", onboarding_resend_code_path,
+              method: :post,
+              class: "text-blue-600 font-medium hover:text-blue-700" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const inputs = document.querySelectorAll('#code-inputs input');
+    const form = document.getElementById('verify-form');
+    const hiddenField = document.getElementById('verification-code-hidden');
+
+    inputs.forEach((input, index) => {
+      input.addEventListener('input', function(e) {
+        const value = e.target.value;
+
+        if (value.length === 1 && index < inputs.length - 1) {
+          inputs[index + 1].focus();
+        }
+
+        // Check if all inputs are filled
+        const code = Array.from(inputs).map(i => i.value).join('');
+        if (code.length === 6) {
+          hiddenField.value = code;
+          form.submit();
+        }
+      });
+
+      input.addEventListener('keydown', function(e) {
+        if (e.key === 'Backspace' && !e.target.value && index > 0) {
+          inputs[index - 1].focus();
+        }
+      });
+
+      input.addEventListener('paste', function(e) {
+        e.preventDefault();
+        const pastedData = e.clipboardData.getData('text').slice(0, 6);
+        pastedData.split('').forEach((char, i) => {
+          if (inputs[i]) {
+            inputs[i].value = char;
+          }
+        });
+        if (pastedData.length === 6) {
+          hiddenField.value = pastedData;
+          form.submit();
+        }
+      });
+    });
+  });
+</script>
