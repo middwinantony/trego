@@ -6,8 +6,6 @@ module Admin
       if params[:status].present?
         @complaints = @complaints.where(status: params[:status])
       end
-
-      @complaints = @complaints.page(params[:page]).per(20) if defined?(Kaminari)
     end
 
     def show

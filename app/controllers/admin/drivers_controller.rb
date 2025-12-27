@@ -1,7 +1,7 @@
 module Admin
   class DriversController < BaseController
     def index
-      @drivers = User.drivers.includes(:vehicle, :current_subscription).order(created_at: :desc)
+      @drivers = User.drivers.includes(:vehicles, :current_subscription).order(created_at: :desc)
 
       if params[:status] == 'pending'
         @drivers = @drivers.where(approved: false)

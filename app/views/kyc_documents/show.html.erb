@@ -1,0 +1,178 @@
+<div class="min-h-screen bg-white">
+  <!-- Navigation -->
+  <nav class="bg-black shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16">
+        <div class="flex items-center">
+          <%= link_to root_path do %>
+            <h1 class="text-3xl font-bold text-white">Trego</h1>
+          <% end %>
+        </div>
+        <div class="flex items-center space-x-4">
+          <%= link_to "Dashboard", dashboard_path, class: "text-white hover:text-gray-300 font-medium" %>
+          <%= button_to "Logout", destroy_user_session_path, method: :delete, class: "bg-white hover:bg-gray-200 text-black font-medium py-2 px-4 rounded transition duration-150" %>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+    <%= link_to kyc_documents_path, class: "text-sm text-black hover:text-gray-700 mb-6 inline-flex items-center" do %>
+      <svg class="h-5 w-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+      </svg>
+      Back to KYC Documents
+    <% end %>
+
+    <div class="bg-white shadow-md rounded-lg border border-gray-200 overflow-hidden mt-6">
+      <!-- Document Header -->
+      <div class="px-6 py-6 border-b border-gray-200 bg-gray-50">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-2xl font-bold text-gray-900"><%= @kyc_document.document_type.titleize.gsub('_', ' ') %></h2>
+            <p class="text-sm text-gray-500 mt-1">
+              Uploaded <%= time_ago_in_words(@kyc_document.created_at) %> ago
+            </p>
+          </div>
+          <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+            <%= case @kyc_document.status
+                when 'approved' then 'bg-green-100 text-green-800'
+                when 'rejected' then 'bg-red-100 text-red-800'
+                else 'bg-yellow-100 text-yellow-800'
+                end %>">
+            <%= @kyc_document.status.titleize %>
+          </span>
+        </div>
+      </div>
+
+      <!-- Document Details -->
+      <div class="px-6 py-6">
+        <div class="space-y-6">
+          <!-- Document Information -->
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Document Information</h3>
+            <dl class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <dt class="text-sm font-medium text-gray-500">Document Type</dt>
+                <dd class="text-sm text-gray-900 mt-1 font-semibold">
+                  <%= @kyc_document.document_type.titleize.gsub('_', ' ') %>
+                </dd>
+              </div>
+              <div>
+                <dt class="text-sm font-medium text-gray-500">Status</dt>
+                <dd class="text-sm text-gray-900 mt-1">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                    <%= case @kyc_document.status
+                        when 'approved' then 'bg-green-100 text-green-800'
+                        when 'rejected' then 'bg-red-100 text-red-800'
+                        else 'bg-yellow-100 text-yellow-800'
+                        end %>">
+                    <%= @kyc_document.status.titleize %>
+                  </span>
+                </dd>
+              </div>
+              <div>
+                <dt class="text-sm font-medium text-gray-500">Uploaded On</dt>
+                <dd class="text-sm text-gray-900 mt-1">
+                  <%= @kyc_document.created_at.strftime("%B %d, %Y at %I:%M %p") %>
+                </dd>
+              </div>
+              <div>
+                <dt class="text-sm font-medium text-gray-500">Last Updated</dt>
+                <dd class="text-sm text-gray-900 mt-1">
+                  <%= @kyc_document.updated_at.strftime("%B %d, %Y at %I:%M %p") %>
+                </dd>
+              </div>
+            </dl>
+          </div>
+
+          <!-- Status Message -->
+          <% if @kyc_document.status == 'pending' %>
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+              <div class="flex">
+                <div class="flex-shrink-0">
+                  <svg class="h-5 w-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                </div>
+                <div class="ml-3">
+                  <p class="text-sm text-yellow-700">
+                    Your document is being reviewed. We'll notify you once it's approved.
+                  </p>
+                </div>
+              </div>
+            </div>
+          <% elsif @kyc_document.status == 'approved' %>
+            <div class="bg-green-50 border-l-4 border-green-400 p-4">
+              <div class="flex">
+                <div class="flex-shrink-0">
+                  <svg class="h-5 w-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                </div>
+                <div class="ml-3">
+                  <p class="text-sm text-green-700">
+                    Your document has been approved!
+                  </p>
+                </div>
+              </div>
+            </div>
+          <% elsif @kyc_document.status == 'rejected' %>
+            <div class="bg-red-50 border-l-4 border-red-400 p-4">
+              <div class="flex">
+                <div class="flex-shrink-0">
+                  <svg class="h-5 w-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                </div>
+                <div class="ml-3">
+                  <p class="text-sm text-red-700">
+                    Your document was rejected. Please upload a new document or contact support for more information.
+                  </p>
+                </div>
+              </div>
+            </div>
+          <% end %>
+
+          <!-- Document Preview/Download -->
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Document File</h3>
+            <% if @kyc_document.file.attached? %>
+              <div class="bg-gray-50 rounded-lg p-6 border-2 border-dashed border-gray-300">
+                <% if @kyc_document.file.content_type.include?('image') %>
+                  <div class="text-center">
+                    <%= image_tag @kyc_document.file, class: "max-w-full h-auto rounded-lg shadow-lg mx-auto" %>
+                  </div>
+                <% else %>
+                  <div class="text-center">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                    </svg>
+                    <p class="mt-2 text-sm text-gray-600"><%= @kyc_document.file.filename %></p>
+                    <%= link_to "Download Document", rails_blob_path(@kyc_document.file, disposition: "attachment"), class: "mt-4 inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50" %>
+                  </div>
+                <% end %>
+              </div>
+            <% else %>
+              <div class="bg-gray-50 rounded-lg p-6 border-2 border-dashed border-gray-300 text-center">
+                <p class="text-gray-500">No file attached</p>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer Actions -->
+      <div class="px-6 py-4 bg-gray-50 border-t border-gray-200">
+        <div class="flex justify-between items-center">
+          <%= link_to kyc_documents_path, class: "inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50" do %>
+            Back to Documents
+          <% end %>
+          <% if @kyc_document.status == 'rejected' %>
+            <%= link_to "Upload New Document", new_kyc_document_path, class: "inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-black hover:bg-gray-800" %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

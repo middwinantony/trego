@@ -6,8 +6,6 @@ module Admin
       if params[:status].present?
         @rides = @rides.where(status: params[:status])
       end
-
-      @rides = @rides.page(params[:page]).per(20) if defined?(Kaminari)
     end
 
     def show

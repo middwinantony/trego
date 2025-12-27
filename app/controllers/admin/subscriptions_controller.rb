@@ -6,8 +6,6 @@ module Admin
       if params[:status].present?
         @subscriptions = @subscriptions.where(status: params[:status])
       end
-
-      @subscriptions = @subscriptions.page(params[:page]).per(20) if defined?(Kaminari)
     end
 
     def show

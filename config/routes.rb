@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
-  devise_for :users, controllers: {
-    registrations: 'users/registrations'
+  devise_for :users, skip: [:registrations], controllers: {
+    sessions: 'devise/sessions'
   }
 
   # Onboarding routes
@@ -17,13 +17,7 @@ Rails.application.routes.draw do
   get '/onboarding/documents', to: 'onboarding#documents', as: :onboarding_documents
   get '/onboarding/complete', to: 'onboarding#complete', as: :onboarding_complete
 
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
-
-  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check
-
-  # Defines the root path route ("/")
   root 'onboarding#welcome'
 
   # Subscriptions
@@ -80,7 +74,6 @@ Rails.application.routes.draw do
   # Admin namespace
   namespace :admin do
     root to: 'dashboard#index'
-    get 'dashboard', to: 'dashboard#index'
 
     resources :drivers, only: [:index, :show] do
       member do

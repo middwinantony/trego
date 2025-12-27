@@ -55,11 +55,9 @@ class RidesController < ApplicationController
   def new
     @ride = Ride.new(pickup: params[:pickup], dropoff: params[:dropoff])
 
-    # Geocode locations if provided
+    # Calculate pricing for all ride types if locations provided
     if @ride.pickup.present? && @ride.dropoff.present?
-      @ride.geocode_locations
-
-      # Calculate pricing for all ride types
+      @ride.valid? # Trigger geocoding callbacks
       pricing_service = RidePricingService.new(@ride)
       @ride_options = pricing_service.calculate_all_options
     end

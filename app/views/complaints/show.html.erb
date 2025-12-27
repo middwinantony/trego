@@ -1,0 +1,123 @@
+<div class="min-h-screen bg-white">
+  <!-- Navigation -->
+  <nav class="bg-black shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16">
+        <div class="flex items-center">
+          <%= link_to root_path do %>
+            <h1 class="text-3xl font-bold text-white">Trego</h1>
+          <% end %>
+        </div>
+        <div class="flex items-center space-x-4">
+          <%= link_to "Dashboard", dashboard_path, class: "text-white hover:text-gray-300 font-medium" %>
+          <%= button_to "Logout", destroy_user_session_path, method: :delete, class: "bg-white hover:bg-gray-200 text-black font-medium py-2 px-4 rounded transition duration-150" %>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+    <%= link_to complaints_path, class: "text-sm text-black hover:text-gray-700 mb-6 inline-flex items-center" do %>
+      <svg class="h-5 w-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+      </svg>
+      Back to Complaints
+    <% end %>
+
+    <div class="bg-white shadow-md rounded-lg border border-gray-200 overflow-hidden mt-6">
+      <div class="px-6 py-5 border-b border-gray-200 bg-gray-50">
+        <div class="flex items-center justify-between">
+          <h2 class="text-2xl font-bold text-gray-900"><%= @complaint.subject %></h2>
+          <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+            <%= case @complaint.status
+                when 'open' then 'bg-red-100 text-red-800'
+                when 'in_progress' then 'bg-yellow-100 text-yellow-800'
+                when 'resolved' then 'bg-green-100 text-green-800'
+                when 'closed' then 'bg-gray-100 text-gray-800'
+                end %>">
+            <%= @complaint.status.titleize %>
+          </span>
+        </div>
+        <p class="mt-2 text-sm text-gray-500">
+          Submitted <%= time_ago_in_words(@complaint.created_at) %> ago
+        </p>
+      </div>
+
+      <div class="px-6 py-6">
+        <div class="space-y-6">
+          <!-- Description -->
+          <div>
+            <h3 class="text-sm font-medium text-gray-500 mb-2">Description</h3>
+            <div class="bg-gray-50 rounded-lg p-4">
+              <p class="text-gray-900 whitespace-pre-wrap"><%= @complaint.description %></p>
+            </div>
+          </div>
+
+          <!-- Related Ride -->
+          <% if @complaint.ride %>
+            <div>
+              <h3 class="text-sm font-medium text-gray-500 mb-2">Related Ride</h3>
+              <div class="bg-gray-50 rounded-lg p-4">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-sm font-medium text-gray-900">
+                      <%= @complaint.ride.pickup %> → <%= @complaint.ride.dropoff %>
+                    </p>
+                    <p class="text-sm text-gray-500 mt-1">
+                      <%= @complaint.ride.created_at.strftime("%B %d, %Y at %I:%M %p") %>
+                    </p>
+                  </div>
+                  <%= link_to "View Ride", ride_path(@complaint.ride), class: "text-sm text-black hover:text-gray-700 font-medium" %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+
+          <!-- Admin Response (if any) -->
+          <% if @complaint.admin_response.present? %>
+            <div>
+              <h3 class="text-sm font-medium text-gray-500 mb-2">Admin Response</h3>
+              <div class="bg-blue-50 rounded-lg p-4 border-l-4 border-blue-500">
+                <p class="text-gray-900 whitespace-pre-wrap"><%= @complaint.admin_response %></p>
+                <% if @complaint.resolved_at %>
+                  <p class="text-xs text-gray-500 mt-2">
+                    Resolved on <%= @complaint.resolved_at.strftime("%B %d, %Y at %I:%M %p") %>
+                  </p>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+
+          <!-- Timestamps -->
+          <div class="border-t border-gray-200 pt-4">
+            <dl class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <dt class="text-xs font-medium text-gray-500 uppercase">Created</dt>
+                <dd class="text-sm text-gray-900 mt-1">
+                  <%= @complaint.created_at.strftime("%B %d, %Y at %I:%M %p") %>
+                </dd>
+              </div>
+              <div>
+                <dt class="text-xs font-medium text-gray-500 uppercase">Last Updated</dt>
+                <dd class="text-sm text-gray-900 mt-1">
+                  <%= @complaint.updated_at.strftime("%B %d, %Y at %I:%M %p") %>
+                </dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+      </div>
+
+      <div class="px-6 py-4 bg-gray-50 border-t border-gray-200">
+        <div class="flex justify-between items-center">
+          <p class="text-sm text-gray-500">
+            Status will be updated by our support team
+          </p>
+          <%= link_to complaints_path, class: "inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50" do %>
+            Back to Complaints
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

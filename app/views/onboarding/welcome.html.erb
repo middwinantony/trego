@@ -16,11 +16,15 @@
 
       <!-- Action Buttons -->
       <div class="space-y-4">
-        <%= link_to "Continue as Rider", onboarding_phone_path(role: 'customer'),
-            class: "block w-full bg-blue-600 text-white text-center font-semibold py-4 rounded-2xl hover:bg-blue-700 transition duration-200" %>
+        <%= link_to onboarding_phone_path(role: 'customer'),
+            class: "block w-full bg-white text-blue-600 border-2 border-blue-600 text-center font-semibold py-4 rounded-2xl hover:bg-gray-50 transition duration-200" do %>
+          Continue as Rider
+        <% end %>
 
-        <%= link_to "Continue as Driver", onboarding_phone_path(role: 'driver'),
-            class: "block w-full bg-white text-blue-600 border-2 border-blue-600 text-center font-semibold py-4 rounded-2xl hover:bg-gray-50 transition duration-200" %>
+        <%= link_to onboarding_phone_path(role: 'driver'),
+            class: "block w-full bg-white text-blue-600 border-2 border-blue-600 text-center font-semibold py-4 rounded-2xl hover:bg-gray-50 transition duration-200" do %>
+          Continue as Driver
+        <% end %>
       </div>
 
       <!-- Terms -->

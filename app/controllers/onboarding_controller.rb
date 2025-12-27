@@ -110,13 +110,7 @@ class OnboardingController < ApplicationController
     if user.save
       sign_in(user)
       session[:user_just_created] = true
-
-      # Redirect based on role
-      if user.driver?
-        redirect_to onboarding_permissions_path
-      else
-        redirect_to onboarding_permissions_path
-      end
+      redirect_to onboarding_permissions_path
     else
       flash[:alert] = user.errors.full_messages.join(", ")
       redirect_to onboarding_profile_path

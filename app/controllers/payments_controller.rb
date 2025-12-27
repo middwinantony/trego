@@ -60,9 +60,9 @@ class PaymentsController < ApplicationController
       })
 
       @payment.update(status: 'refunded')
-      redirect_to admin_payments_path, notice: "Payment refunded successfully"
+      redirect_to admin_root_path, notice: "Payment refunded successfully"
     rescue Stripe::InvalidRequestError => e
-      redirect_to admin_payments_path, alert: "Refund failed: #{e.message}"
+      redirect_to admin_root_path, alert: "Refund failed: #{e.message}"
     end
   end
 end

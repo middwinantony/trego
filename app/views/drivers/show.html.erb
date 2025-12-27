@@ -1,0 +1,148 @@
+<div class="min-h-screen bg-white">
+  <!-- Navigation -->
+  <nav class="bg-black shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16">
+        <div class="flex items-center">
+          <%= link_to root_path do %>
+            <h1 class="text-3xl font-bold text-white">Trego</h1>
+          <% end %>
+        </div>
+        <div class="flex items-center space-x-4">
+          <%= link_to "Dashboard", dashboard_path, class: "text-white hover:text-gray-300 font-medium" %>
+          <%= button_to "Logout", destroy_user_session_path, method: :delete, class: "bg-white hover:bg-gray-200 text-black font-medium py-2 px-4 rounded transition duration-150" %>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+    <%= link_to drivers_path, class: "text-sm text-black hover:text-gray-700 mb-6 inline-flex items-center" do %>
+      <svg class="h-5 w-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+      </svg>
+      Back to Drivers
+    <% end %>
+
+    <div class="bg-white shadow-md rounded-lg border border-gray-200 overflow-hidden mt-6">
+      <!-- Driver Header -->
+      <div class="px-6 py-6 border-b border-gray-200 bg-gray-50">
+        <div class="flex items-center">
+          <div class="h-20 w-20 rounded-full bg-black flex items-center justify-center mr-6">
+            <span class="text-3xl font-bold text-white"><%= @driver.name[0].upcase %></span>
+          </div>
+          <div class="flex-1">
+            <h2 class="text-2xl font-bold text-gray-900"><%= @driver.name %></h2>
+            <div class="flex items-center space-x-3 mt-2">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= @driver.available? ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' %>">
+                <%= @driver.available? ? 'Online' : 'Offline' %>
+              </span>
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                <%= @driver.rides_as_driver.completed.count %> Completed Rides
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Driver Details -->
+      <div class="px-6 py-6">
+        <div class="space-y-6">
+          <!-- Contact Information -->
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Contact Information</h3>
+            <dl class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <dt class="text-sm font-medium text-gray-500">Email</dt>
+                <dd class="text-sm text-gray-900 mt-1"><%= @driver.email %></dd>
+              </div>
+              <div>
+                <dt class="text-sm font-medium text-gray-500">Phone</dt>
+                <dd class="text-sm text-gray-900 mt-1"><%= @driver.phone %></dd>
+              </div>
+            </dl>
+          </div>
+
+          <!-- Rating -->
+          <% if @driver.rides_as_driver.completed.any? %>
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900 mb-4">Rating</h3>
+              <div class="flex items-center">
+                <div class="flex items-center">
+                  <% average_rating = @driver.average_rating || 0 %>
+                  <% 5.times do |i| %>
+                    <svg class="h-5 w-5 <%= i < average_rating.round ? 'text-yellow-400' : 'text-gray-300' %>" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                    </svg>
+                  <% end %>
+                </div>
+                <span class="ml-2 text-sm text-gray-600"><%= number_with_precision(average_rating, precision: 1) %> / 5.0</span>
+              </div>
+            </div>
+          <% end %>
+
+          <!-- Vehicles -->
+          <% if @driver.vehicles.approved.any? %>
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900 mb-4">Vehicles</h3>
+              <div class="space-y-3">
+                <% @driver.vehicles.approved.each do |vehicle| %>
+                  <div class="bg-gray-50 rounded-lg p-4">
+                    <div class="flex items-center justify-between">
+                      <div>
+                        <p class="text-sm font-medium text-gray-900">
+                          <%= vehicle.make %> <%= vehicle.model %>
+                        </p>
+                        <p class="text-xs text-gray-500 mt-1">
+                          <%= vehicle.color %> • <%= vehicle.plate %>
+                        </p>
+                      </div>
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        Verified
+                      </span>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+
+          <!-- Statistics -->
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Statistics</h3>
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+              <div class="bg-gray-50 rounded-lg p-4">
+                <div class="text-center">
+                  <p class="text-2xl font-bold text-gray-900"><%= @driver.rides_as_driver.count %></p>
+                  <p class="text-xs text-gray-500 mt-1">Total Rides</p>
+                </div>
+              </div>
+              <div class="bg-gray-50 rounded-lg p-4">
+                <div class="text-center">
+                  <p class="text-2xl font-bold text-gray-900"><%= @driver.rides_as_driver.completed.count %></p>
+                  <p class="text-xs text-gray-500 mt-1">Completed</p>
+                </div>
+              </div>
+              <div class="bg-gray-50 rounded-lg p-4">
+                <div class="text-center">
+                  <p class="text-2xl font-bold text-gray-900">$<%= number_with_precision(@driver.total_earnings || 0, precision: 2) %></p>
+                  <p class="text-xs text-gray-500 mt-1">Total Earnings</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="px-6 py-4 bg-gray-50 border-t border-gray-200">
+        <div class="flex justify-between items-center">
+          <p class="text-sm text-gray-500">Member since <%= @driver.created_at.strftime("%B %Y") %></p>
+          <%= link_to drivers_path, class: "inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50" do %>
+            Back to Drivers
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
